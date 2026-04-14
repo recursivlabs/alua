@@ -1,20 +1,14 @@
-import { ScrollView, View, Text, StyleSheet, TouchableOpacity, useWindowDimensions, Platform } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, useWindowDimensions, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
+import Cta from '@/components/common/Cta';
 
 const C = {
-  bg: '#FAF7F4',
-  text: '#1A1A1A',
-  textLight: '#6B6560',
-  textMuted: '#A09890',
-  accent: '#C4956A',
-  dark: '#1A2F38',
-  darkMuted: '#2D4A55',
-  cream: '#F0EBE4',
-  border: '#E8E0D8',
-  white: '#FFFFFF',
+  bg: '#FAF7F4', text: '#1A1A1A', textLight: '#6B6560', textMuted: '#A09890',
+  accent: '#C4956A', dark: '#1A2F38', darkMuted: '#2D4A55', cream: '#F0EBE4',
+  border: '#E8E0D8', white: '#FFFFFF',
 };
 
 export default function HomeScreen() {
@@ -26,29 +20,20 @@ export default function HomeScreen() {
   const isWide = width > 900;
   const heroHeight = isWeb ? Math.max(height * 0.92, 600) : height * 0.85;
 
+  const goSignUp = () => router.push('/auth/sign-up');
+
   return (
-    <ScrollView
-      style={{ flex: 1, backgroundColor: C.bg }}
-      contentContainerStyle={{ paddingBottom: insets.bottom + 60 }}
-      showsVerticalScrollIndicator={false}>
+    <ScrollView style={{ flex: 1, backgroundColor: C.bg }} contentContainerStyle={{ paddingBottom: insets.bottom + 60 }} showsVerticalScrollIndicator={false}>
 
       {/* Hero */}
       <View style={[s.hero, { minHeight: heroHeight, paddingTop: insets.top }]}>
         <View style={s.heroInner}>
           <Text style={[s.brandMark, isWide && s.brandMarkLarge]}>ALUA</Text>
           <View style={s.heroLine} />
-          <Text style={[s.heroTagline, isWide && s.heroTaglineLarge]}>
-            Breathwork & Surf Retreats
-          </Text>
-          <Text style={s.heroSub}>
-            Sri Lanka  ·  Indonesia  ·  Costa Rica
-          </Text>
+          <Text style={[s.heroTagline, isWide && s.heroTaglineLarge]}>Breathwork & Surf Retreats</Text>
+          <Text style={s.heroSub}>Sri Lanka  ·  Indonesia  ·  Costa Rica</Text>
         </View>
-        <TouchableOpacity
-          style={s.heroCta}
-          onPress={() => router.push('/(tabs)/retreats')}>
-          <Text style={s.heroCtaText}>Explore Retreats</Text>
-        </TouchableOpacity>
+        <Cta title="Explore Retreats" onPress={() => router.push('/(tabs)/retreats')} style={{ marginTop: 48 }} />
         <Text style={s.scrollHint}>↓</Text>
       </View>
 
@@ -71,9 +56,9 @@ export default function HomeScreen() {
           <Text style={[s.eyebrow, { color: C.accent }]}>OFFERINGS</Text>
           <View style={[s.offeringsGrid, isWide && s.offeringsGridWide]}>
             {[
-              { num: '01', title: 'Retreats', desc: '5 nights, 6 days. Daily breathwork and surf. Nourishing meals, beachfront accommodations, and a small community of 12.', price: 'From $1,800', icon: 'compass-outline' as const },
-              { num: '02', title: 'Experiences', desc: 'One day. Breathwork session, guided surf lesson, board rental, and a shared meal. The perfect introduction.', price: 'From $95', icon: 'sunny-outline' as const },
-              { num: '03', title: 'Online Studio', desc: 'Live breathwork sessions and a full library of guided practices. Continue your journey between retreats.', price: '$22 / month', icon: 'play-circle-outline' as const },
+              { num: '01', title: 'Retreats', desc: '5 nights, 6 days. Daily breathwork and surf. Nourishing meals, beachfront accommodations, and a small community of 12.', price: 'From $1,800', icon: 'compass-outline' as const, cta: 'View Retreats', route: '/(tabs)/retreats' },
+              { num: '02', title: 'Experiences', desc: 'One day. Breathwork session, guided surf lesson, board rental, and a shared meal. The perfect introduction.', price: 'From $95', icon: 'sunny-outline' as const, cta: 'View Experiences', route: '/(tabs)/experiences' },
+              { num: '03', title: 'Online Studio', desc: 'Live breathwork sessions and a full library of guided practices. Continue your journey between retreats.', price: '$22 / month', icon: 'play-circle-outline' as const, cta: 'Learn More', route: '/(tabs)/studio' },
             ].map((o, i) => (
               <View key={o.num}>
                 {i > 0 && <View style={[s.offeringDivider, isWide && s.offeringDividerWide]} />}
@@ -85,6 +70,7 @@ export default function HomeScreen() {
                   <Text style={s.offeringTitle}>{o.title}</Text>
                   <Text style={s.offeringDesc}>{o.desc}</Text>
                   <Text style={s.offeringPrice}>{o.price}</Text>
+                  <Cta title={o.cta} variant="secondary" onPress={() => router.push(o.route as any)} style={{ borderColor: '#3D5A65', marginTop: 16 }} />
                 </View>
               </View>
             ))}
@@ -100,7 +86,6 @@ export default function HomeScreen() {
           <Text style={[s.sectionBody, { marginBottom: 48 }]}>
             Each location opens when the ocean is right. Warm water, clean swells, and the conditions for transformation.
           </Text>
-
           <View style={[s.locationsGrid, isWide && s.locationsGridWide]}>
             {[
               { name: 'Sri Lanka', region: 'South Coast', season: 'November to April', detail: 'Weligama & Mirissa. Warm Indian Ocean swells, uncrowded points, the rhythm of slowing down.', icon: 'water-outline' as const },
@@ -108,10 +93,8 @@ export default function HomeScreen() {
               { name: 'Costa Rica', region: 'Pacific Coast', season: 'December to April', detail: 'Nosara & Santa Teresa. Offshore winds, warm water, a community drawn to intentional living.', icon: 'sunny-outline' as const },
             ].map((loc, i) => (
               <View key={loc.name} style={[s.locationItem, isWide ? (i > 0 ? { borderLeftWidth: 1, borderLeftColor: C.border, paddingLeft: 32 } : {}) : (i > 0 ? { borderTopWidth: 1, borderTopColor: C.border } : {})]}>
-                <View style={s.locationIconRow}>
-                  <View style={s.locationIconCircle}>
-                    <Ionicons name={loc.icon} size={20} color={C.accent} />
-                  </View>
+                <View style={s.locationIconCircle}>
+                  <Ionicons name={loc.icon} size={20} color={C.accent} />
                 </View>
                 <Text style={s.locationName}>{loc.name}</Text>
                 <Text style={s.locationRegion}>{loc.region}</Text>
@@ -147,18 +130,19 @@ export default function HomeScreen() {
 
       {/* Final CTA */}
       <View style={[s.section, s.ctaSection]}>
-        <View style={s.contentBlock}>
-          <Text style={[s.ctaHeadline, isWide && s.ctaHeadlineLarge]}>
-            Come as you are.
-          </Text>
+        <View style={[s.contentBlock, { alignItems: 'center' }]}>
+          <Text style={[s.ctaHeadline, isWide && s.ctaHeadlineLarge]}>Come as you are.</Text>
           <Text style={s.ctaSub}>
             No surf experience needed. No flexibility required.{'\n'}Just an open heart and willingness to slow down.
           </Text>
-          <TouchableOpacity
-            style={s.ctaButton}
-            onPress={() => isAuthenticated ? router.push('/(tabs)/retreats') : router.push('/auth/sign-up')}>
-            <Text style={s.ctaButtonText}>Begin</Text>
-          </TouchableOpacity>
+          {isAuthenticated ? (
+            <Cta title="Browse Retreats" onPress={() => router.push('/(tabs)/retreats')} />
+          ) : (
+            <View style={{ alignItems: 'center' }}>
+              <Cta title="Create Your Account" onPress={goSignUp} />
+              <Cta title="View Retreats" variant="secondary" onPress={() => router.push('/(tabs)/retreats')} />
+            </View>
+          )}
         </View>
       </View>
 
@@ -182,8 +166,6 @@ const s = StyleSheet.create({
   heroTagline: { fontSize: 15, fontWeight: '400', letterSpacing: 4, color: C.textLight, textTransform: 'uppercase', textAlign: 'center', paddingLeft: 4 },
   heroTaglineLarge: { fontSize: 17, letterSpacing: 6, paddingLeft: 6 },
   heroSub: { fontSize: 13, letterSpacing: 3, color: C.textMuted, textTransform: 'uppercase', marginTop: 12, textAlign: 'center', paddingLeft: 3 },
-  heroCta: { marginTop: 48, borderWidth: 1, borderColor: C.text, paddingHorizontal: 36, paddingVertical: 14 },
-  heroCtaText: { fontSize: 12, fontWeight: '500', letterSpacing: 3, color: C.text, textTransform: 'uppercase' },
   scrollHint: { position: 'absolute', bottom: 32, fontSize: 18, color: C.textMuted },
 
   section: { paddingVertical: 80, paddingHorizontal: 32 },
@@ -212,8 +194,7 @@ const s = StyleSheet.create({
   locationsGrid: {},
   locationsGridWide: { flexDirection: 'row', gap: 32 },
   locationItem: { flex: 1, paddingVertical: 24 },
-  locationIconRow: { marginBottom: 16 },
-  locationIconCircle: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.white, justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 1 },
+  locationIconCircle: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.white, justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 1, marginBottom: 16 },
   locationName: { fontSize: 22, fontWeight: '400', color: C.text, marginBottom: 2 },
   locationRegion: { fontSize: 13, fontWeight: '500', letterSpacing: 2, color: C.accent, textTransform: 'uppercase', marginBottom: 8 },
   locationSeason: { fontSize: 14, fontWeight: '400', color: C.textLight, marginBottom: 10 },
@@ -229,9 +210,7 @@ const s = StyleSheet.create({
   ctaSection: { paddingVertical: 120, alignItems: 'center', backgroundColor: C.bg },
   ctaHeadline: { fontSize: 40, fontWeight: '200', color: C.text, textAlign: 'center', letterSpacing: -0.5, marginBottom: 16 },
   ctaHeadlineLarge: { fontSize: 56 },
-  ctaSub: { fontSize: 16, fontWeight: '400', lineHeight: 28, color: C.textLight, textAlign: 'center', marginBottom: 40 },
-  ctaButton: { alignSelf: 'center', backgroundColor: C.dark, paddingHorizontal: 48, paddingVertical: 16 },
-  ctaButtonText: { fontSize: 12, fontWeight: '500', letterSpacing: 4, color: C.white, textTransform: 'uppercase' },
+  ctaSub: { fontSize: 16, fontWeight: '400', lineHeight: 28, color: C.textLight, textAlign: 'center', marginBottom: 20 },
 
   footer: { alignItems: 'center', paddingVertical: 60, paddingHorizontal: 32, backgroundColor: C.bg },
   footerBrand: { fontSize: 20, fontWeight: '200', letterSpacing: 12, color: C.textMuted, marginBottom: 6, paddingLeft: 12 },

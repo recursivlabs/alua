@@ -8,6 +8,7 @@ import { dbQuery } from '@/lib/database';
 import { STUDIO_PRICING, formatPrice } from '@/constants/pricing';
 import { useState, useEffect } from 'react';
 import type { StudioContent } from '@/hooks/useStudioContent';
+import Cta from '@/components/common/Cta';
 
 const C = {
   bg: '#FAF7F4', text: '#1A1A1A', textLight: '#6B6560', textMuted: '#A09890',
@@ -45,9 +46,7 @@ export default function StudioScreen() {
           Continue your journey between retreats, or start one from home.
         </Text>
         {!isAuthenticated && (
-          <TouchableOpacity style={s.heroCta} onPress={() => router.push('/auth/sign-up')}>
-            <Text style={s.heroCtaText}>Start Your Practice</Text>
-          </TouchableOpacity>
+          <Cta title="Start Your Practice" onPress={() => router.push('/auth/sign-up')} style={{ marginTop: 32 }} />
         )}
       </View>
 
@@ -66,9 +65,12 @@ export default function StudioScreen() {
             <Text style={s.pricePer}>/ year</Text>
           </View>
         </View>
-        <TouchableOpacity style={s.subscribeBtnDark} onPress={() => isAuthenticated ? Alert.alert('Coming Soon', 'Stripe subscription integration is being set up. You\'ll be able to subscribe directly from here soon.') : router.push('/auth/sign-up')}>
-          <Text style={s.subscribeBtnText}>{isAuthenticated ? 'Subscribe' : 'Start Your Practice'}</Text>
-        </TouchableOpacity>
+        <Cta
+          title={isAuthenticated ? 'Subscribe' : 'Start Your Practice'}
+          variant="secondary"
+          onPress={() => isAuthenticated ? Alert.alert('Coming Soon', 'Stripe subscription is being set up. You\'ll be able to subscribe directly from here soon.') : router.push('/auth/sign-up')}
+          style={{ borderColor: '#3D5A65', alignSelf: 'center', marginTop: 24 }}
+        />
       </View>
 
       {/* What you get */}

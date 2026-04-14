@@ -9,6 +9,7 @@ import { formatPrice } from '@/constants/pricing';
 import { RETREAT_INCLUDED } from '@/constants/content';
 import { useState, useEffect } from 'react';
 import type { Retreat } from '@/hooks/useRetreats';
+import Cta from '@/components/common/Cta';
 
 const C = {
   bg: '#FAF7F4', text: '#1A1A1A', textLight: '#6B6560', textMuted: '#A09890',
@@ -50,9 +51,7 @@ export default function RetreatsScreen() {
           A small group of 12 in the world's most beautiful coastlines.
         </Text>
         {!isAuthenticated && (
-          <TouchableOpacity style={s.heroCta} onPress={() => router.push('/auth/sign-up')}>
-            <Text style={s.heroCtaText}>Sign Up to Book</Text>
-          </TouchableOpacity>
+          <Cta title="Sign Up to Book" onPress={() => router.push('/auth/sign-up')} style={{ marginTop: 32 }} />
         )}
       </View>
 
@@ -79,12 +78,8 @@ export default function RetreatsScreen() {
                   )}
                 </TouchableOpacity>
                 <View style={s.retreatActions}>
-                  <TouchableOpacity style={s.viewBtn} onPress={() => router.push(`/retreat/${r.id}`)}>
-                    <Text style={s.viewBtnText}>View Details</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={s.bookBtn} onPress={() => router.push({ pathname: '/booking/checkout', params: { type: 'retreat', id: r.id } })}>
-                    <Text style={s.bookBtnText}>Book Now</Text>
-                  </TouchableOpacity>
+                  <Cta title="View Details" variant="secondary" onPress={() => router.push(`/retreat/${r.id}`)} style={{ flex: 1, marginTop: 0 }} />
+                  <Cta title="Book Now" onPress={() => router.push({ pathname: '/booking/checkout', params: { type: 'retreat', id: r.id } })} style={{ flex: 1, marginTop: 0 }} />
                 </View>
               </View>
             );
@@ -99,19 +94,10 @@ export default function RetreatsScreen() {
               <Text style={s.retreatLocation}>{r.location}</Text>
               <Text style={s.retreatDates}>{r.dates}</Text>
               {!isAuthenticated && (
-                <TouchableOpacity style={s.bookBtn} onPress={() => router.push('/auth/sign-up')}>
-                  <Text style={s.bookBtnText}>Book This Retreat</Text>
-                </TouchableOpacity>
+                <Cta title="Book This Retreat" onPress={() => router.push('/auth/sign-up')} style={{ marginTop: 20 }} />
               )}
             </View>
           ))}
-
-          {!isAuthenticated && (
-            <TouchableOpacity style={s.signupPrompt} onPress={() => router.push('/auth/sign-up')}>
-              <Ionicons name="person-add-outline" size={16} color={C.accent} />
-              <Text style={s.signupText}>Sign up to book retreats and get notified of new dates</Text>
-            </TouchableOpacity>
-          )}
         </View>
       )}
 
@@ -126,6 +112,16 @@ export default function RetreatsScreen() {
           ))}
         </View>
       </View>
+
+      {/* Bottom CTA */}
+      <View style={s.bottomCta}>
+        <Text style={s.bottomCtaText}>No surf experience needed. All levels welcome.</Text>
+        {isAuthenticated ? (
+          <Cta title="Browse Retreats Above" variant="secondary" onPress={() => {}} />
+        ) : (
+          <Cta title="Create Account to Book" onPress={() => router.push('/auth/sign-up')} />
+        )}
+      </View>
     </ScrollView>
   );
 }
@@ -136,6 +132,7 @@ const s = StyleSheet.create({
   headline: { fontSize: 36, fontWeight: '200', color: C.text, lineHeight: 46, letterSpacing: -0.5, marginBottom: 20 },
   body: { fontSize: 16, fontWeight: '400', lineHeight: 28, color: C.textLight, maxWidth: 520 },
   section: { paddingHorizontal: 32, paddingVertical: 48 },
+
   retreatItem: { paddingVertical: 28 },
   retreatHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
   retreatTitle: { fontSize: 22, fontWeight: '300', color: C.text, letterSpacing: 0.3, flex: 1 },
@@ -143,15 +140,11 @@ const s = StyleSheet.create({
   retreatLocation: { fontSize: 13, fontWeight: '500', letterSpacing: 2, color: C.accent, textTransform: 'uppercase', marginTop: 6 },
   retreatDates: { fontSize: 14, color: C.textLight, marginTop: 4 },
   spotsWarning: { fontSize: 13, fontWeight: '500', color: '#C45A4A', marginTop: 6 },
-  signupPrompt: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 20, marginTop: 16, borderTopWidth: 1, borderTopColor: C.border },
-  signupText: { fontSize: 14, color: C.accent, fontWeight: '400' },
-  heroCta: { backgroundColor: C.dark, paddingHorizontal: 32, paddingVertical: 14, marginTop: 24 },
-  heroCtaText: { fontSize: 12, fontWeight: '500', letterSpacing: 3, color: C.white, textTransform: 'uppercase' },
-  retreatActions: { flexDirection: 'row', gap: 12, marginTop: 16 },
-  viewBtn: { borderWidth: 1, borderColor: C.border, paddingHorizontal: 20, paddingVertical: 10 },
-  viewBtnText: { fontSize: 11, fontWeight: '500', letterSpacing: 2, color: C.text, textTransform: 'uppercase' },
-  bookBtn: { backgroundColor: C.dark, paddingHorizontal: 20, paddingVertical: 10 },
-  bookBtnText: { fontSize: 11, fontWeight: '500', letterSpacing: 2, color: C.white, textTransform: 'uppercase' },
+  retreatActions: { flexDirection: 'row', gap: 12, marginTop: 20 },
+
   includedRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, marginBottom: 12 },
   includedText: { fontSize: 15, lineHeight: 24, color: C.textLight, flex: 1 },
+
+  bottomCta: { alignItems: 'center', paddingVertical: 64, paddingHorizontal: 32 },
+  bottomCtaText: { fontSize: 16, fontWeight: '300', color: C.textLight, marginBottom: 8, textAlign: 'center' },
 });
