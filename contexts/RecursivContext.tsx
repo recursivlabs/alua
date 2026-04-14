@@ -38,3 +38,8 @@ export function useRecursiv() {
   if (!ctx) throw new Error('useRecursiv must be used within RecursivProvider');
   return ctx;
 }
+
+/** Safe version that returns null when not authenticated — for pages that work with or without auth */
+export function useRecursivSafe() {
+  return useContext(RecursivContext);
+}

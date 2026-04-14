@@ -9,6 +9,7 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { RecursivProvider } from '@/contexts/RecursivContext';
 import { Brand } from '@/constants/theme';
+import ChatWidget from '@/components/ai/ChatWidget';
 
 function RootNavigator() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -27,7 +28,7 @@ function RootNavigator() {
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#faf8f5' }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FAF7F4' }}>
         <ActivityIndicator size="large" color={Brand.primary} />
       </View>
     );
@@ -72,6 +73,7 @@ function AuthGate() {
   return (
     <RecursivProvider>
       <RootNavigator />
+      <ChatWidget />
     </RecursivProvider>
   );
 }

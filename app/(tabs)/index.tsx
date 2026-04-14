@@ -129,9 +129,9 @@ export default function HomeScreen() {
           <Text style={[s.eyebrow, { color: C.accent }]}>VALUES</Text>
           <View style={[s.valuesGrid, isWide && s.valuesGridWide]}>
             {[
-              { title: 'Community', body: 'One of the most essential nutrients to our collective healing. Every experience is designed around connection to ourselves, each other, and the natural world.', icon: 'people-outline' as const },
-              { title: 'Sustainability', body: 'Living in deep alignment with nature. Seasonal, slow, and in rhythm. We don\'t force growth. We let it emerge when conditions are right.', icon: 'earth-outline' as const },
-              { title: 'Service', body: 'At the heart of everything. We create spaces and support that facilitate genuine growth, not performance. Plan meticulously, then hold that plan loosely.', icon: 'heart-outline' as const },
+              { title: 'Community', body: 'The most essential nutrient to our collective healing. Every experience is designed around connection to ourselves, each other, and nature.', icon: 'people-outline' as const },
+              { title: 'Sustainability', body: 'Living in deep alignment with nature. Seasonal, slow, and in rhythm. We let growth emerge when conditions are right.', icon: 'earth-outline' as const },
+              { title: 'Service', body: 'At the heart of everything. We create spaces that facilitate genuine growth, not performance. Plan meticulously, hold loosely.', icon: 'heart-outline' as const },
             ].map((v) => (
               <View key={v.title} style={s.valueItem}>
                 <View style={s.valueIconCircle}>
@@ -199,8 +199,8 @@ const s = StyleSheet.create({
   philosophyBody: { fontSize: 16, fontWeight: '400', lineHeight: 28, color: C.textLight, maxWidth: 580 },
 
   offeringsGrid: { marginTop: 40 },
-  offeringsGridWide: { flexDirection: 'row' },
-  offering: { flex: 1, paddingVertical: 24 },
+  offeringsGridWide: { flexDirection: 'row', flexWrap: 'wrap' },
+  offering: { flex: 1, paddingVertical: 24, minWidth: 200 },
   offeringHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
   offeringNumber: { fontSize: 12, fontWeight: '400', letterSpacing: 2, color: C.accent },
   offeringTitle: { fontSize: 24, fontWeight: '300', color: C.white, marginBottom: 12, letterSpacing: 0.5 },
