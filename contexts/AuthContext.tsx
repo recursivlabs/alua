@@ -1,34 +1,16 @@
-import React, { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
-import { Platform } from 'react-native';
+import * as React from 'react';
 import { Recursiv } from '@recursiv/sdk';
 import { anonSdk, createAuthedSdk, ORG_ID } from '@/lib/recursiv';
+import * as storage from '@/lib/storage';
 
-// Direct localStorage on web, SecureStore on native
-const storage = {
-  async get(key: string): Promise<string | null> {
-    if (Platform.OS === 'web') {
-      return typeof window !== 'undefined' ? window.localStorage.getItem(key) : null;
-    }
-    const SecureStore = require('expo-secure-store');
-    return SecureStore.getItemAsync(key);
-  },
-  async set(key: string, value: string): Promise<void> {
-    if (Platform.OS === 'web') {
-      if (typeof window !== 'undefined') window.localStorage.setItem(key, value);
-      return;
-    }
-    const SecureStore = require('expo-secure-store');
-    await SecureStore.setItemAsync(key, value);
-  },
-  async remove(key: string): Promise<void> {
-    if (Platform.OS === 'web') {
-      if (typeof window !== 'undefined') window.localStorage.removeItem(key);
-      return;
-    }
-    const SecureStore = require('expo-secure-store');
-    await SecureStore.deleteItemAsync(key);
-  },
+const KEYS = {
+  apiKey: 'alua:api_key',
+  user: 'alua:user',
+  orgId: 'alua:org_id',
+  version: 'alua:auth_version',
 };
+
+const AUTH_VERSION = '1';
 
 const API_KEY_SCOPES = [
   'posts:read', 'posts:write',
@@ -62,131 +44,123 @@ interface AuthContextValue {
   signOut: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+const AuthContext = React.createContext<AuthContextValue | null>(null);
 
-const K = {
-  apiKey: 'alua_api_key',
-  user: 'alua_user',
-  orgId: 'alua_org_id',
-  version: 'alua_auth_version',
-};
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = React.useState<AuthUser | null>(null);
+  const [authedSdk, setAuthedSdk] = React.useState<Recursiv | null>(null);
+  const [orgId, setOrgId] = React.useState<string | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
 
-const AUTH_VERSION = '1';
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const storedVersion = await storage.getItem(KEYS.version);
+        if (storedVersion !== AUTH_VERSION) {
+          await clearStorage();
+          setIsLoading(false);
+          return;
+        }
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [sdk, setSdk] = useState<Recursiv | null>(null);
-  const [orgId, setOrgId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+        const [storedApiKey, storedUser, storedOrgId] = await Promise.all([
+          storage.getItem(KEYS.apiKey),
+          storage.getItem(KEYS.user),
+          storage.getItem(KEYS.orgId),
+        ]);
 
-  useEffect(() => {
-    restore();
+        if (storedApiKey && storedUser) {
+          const sdk = createAuthedSdk(storedApiKey);
+          try {
+            await sdk.users.me();
+            setAuthedSdk(sdk);
+            setUser(JSON.parse(storedUser));
+            setOrgId(storedOrgId);
+          } catch {
+            await clearStorage();
+          }
+        }
+      } catch {
+        await clearStorage();
+      } finally {
+        setIsLoading(false);
+      }
+    })();
   }, []);
 
-  const restore = async () => {
-    try {
-      const ver = await storage.get(K.version);
-      if (ver !== AUTH_VERSION) {
-        await clear();
-        await storage.set(K.version, AUTH_VERSION);
-        setIsLoading(false);
-        return;
-      }
-
-      const [storedKey, storedUser, storedOrg] = await Promise.all([
-        storage.get(K.apiKey),
-        storage.get(K.user),
-        storage.get(K.orgId),
-      ]);
-
-      if (storedKey && storedUser) {
-        const authedSdk = createAuthedSdk(storedKey);
-        try {
-          await authedSdk.users.me();
-          setSdk(authedSdk);
-          setUser(JSON.parse(storedUser));
-          setOrgId(storedOrg);
-        } catch {
-          await clear();
-        }
-      }
-    } catch (err) {
-      console.error('[Auth] restore error:', err);
-      await clear();
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const persist = async (apiKey: string, authUser: AuthUser) => {
+  async function clearStorage() {
     await Promise.all([
-      storage.set(K.apiKey, apiKey),
-      storage.set(K.user, JSON.stringify(authUser)),
-      storage.set(K.version, AUTH_VERSION),
-      storage.set(K.orgId, ORG_ID),
-    ]);
-  };
+      storage.removeItem(KEYS.apiKey),
+      storage.removeItem(KEYS.user),
+      storage.removeItem(KEYS.orgId),
+      storage.removeItem(KEYS.version),
+    ]).catch(() => {});
+  }
 
-  const signUp = useCallback(async (name: string, email: string, password: string) => {
+  async function persistSession(apiKey: string, authUser: AuthUser) {
+    const sdk = createAuthedSdk(apiKey);
+    await Promise.all([
+      storage.setItem(KEYS.apiKey, apiKey),
+      storage.setItem(KEYS.user, JSON.stringify(authUser)),
+      storage.setItem(KEYS.orgId, ORG_ID),
+      storage.setItem(KEYS.version, AUTH_VERSION),
+    ]);
+    setAuthedSdk(sdk);
+    setUser(authUser);
+    setOrgId(ORG_ID);
+  }
+
+  const signUp = React.useCallback(async (name: string, email: string, password: string) => {
     const result = await anonSdk.auth.signUpAndCreateKey(
       { name, email, password },
       { name: 'alua-' + Date.now(), scopes: [...API_KEY_SCOPES], organizationId: ORG_ID },
     );
-    const authedSdk = createAuthedSdk(result.apiKey);
-    const authUser: AuthUser = {
+    await persistSession(result.apiKey, {
       id: result.user?.id || '',
       name: result.user?.name || name,
       email: result.user?.email || email,
       image: result.user?.image ?? null,
-    };
-    await persist(result.apiKey, authUser);
-    setSdk(authedSdk);
-    setUser(authUser);
-    setOrgId(ORG_ID);
+    });
   }, []);
 
-  const signIn = useCallback(async (email: string, password: string) => {
+  const signIn = React.useCallback(async (email: string, password: string) => {
     const result = await anonSdk.auth.signInAndCreateKey(
       { email, password },
       { name: 'alua-' + Date.now(), scopes: [...API_KEY_SCOPES], organizationId: ORG_ID },
     );
-    const authedSdk = createAuthedSdk(result.apiKey);
-    const authUser: AuthUser = {
+    await persistSession(result.apiKey, {
       id: result.user?.id || '',
       name: result.user?.name || '',
       email: result.user?.email || email,
       image: result.user?.image ?? null,
-    };
-    await persist(result.apiKey, authUser);
-    setSdk(authedSdk);
-    setUser(authUser);
-    setOrgId(ORG_ID);
+    });
   }, []);
 
-  const signOut = useCallback(async () => {
-    await clear();
-    setSdk(null);
+  const signOut = React.useCallback(async () => {
+    await clearStorage();
+    setAuthedSdk(null);
     setUser(null);
     setOrgId(null);
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, sdk, orgId, isLoading, isAuthenticated: !!sdk && !!user, signUp, signIn, signOut }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        sdk: authedSdk,
+        orgId,
+        isLoading,
+        isAuthenticated: !!authedSdk && !!user,
+        signUp,
+        signIn,
+        signOut,
+      }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
 export function useAuth() {
-  const ctx = useContext(AuthContext);
+  const ctx = React.useContext(AuthContext);
   if (!ctx) throw new Error('useAuth must be used within AuthProvider');
   return ctx;
-}
-
-async function clear() {
-  await Promise.all([
-    storage.remove(K.apiKey),
-    storage.remove(K.user),
-    storage.remove(K.orgId),
-  ]);
 }

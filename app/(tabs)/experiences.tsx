@@ -49,6 +49,11 @@ export default function ExperiencesScreen() {
           A single day woven together. Breathwork, surf, and a shared meal.
           The perfect introduction to the Alua practice.
         </Text>
+        {!isAuthenticated && (
+          <TouchableOpacity style={s.heroCta} onPress={() => router.push('/auth/sign-up')}>
+            <Text style={s.heroCtaText}>Sign Up to Book</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {loading ? (
@@ -79,6 +84,11 @@ export default function ExperiencesScreen() {
                 <Text style={s.expLocation}>{e.location}</Text>
                 <Text style={s.expPrice}>{e.price}</Text>
               </View>
+              {!isAuthenticated && (
+                <TouchableOpacity style={s.bookBtn} onPress={() => router.push('/auth/sign-up')}>
+                  <Text style={s.bookBtnText}>Book This Experience</Text>
+                </TouchableOpacity>
+              )}
             </View>
           ))}
           {!isAuthenticated && (
@@ -118,6 +128,8 @@ const s = StyleSheet.create({
   expPrice: { fontSize: 16, fontWeight: '400', color: C.text, letterSpacing: 1 },
   signupPrompt: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 20, marginTop: 16, borderTopWidth: 1, borderTopColor: C.border },
   signupText: { fontSize: 14, color: C.accent, fontWeight: '400' },
+  heroCta: { backgroundColor: C.dark, paddingHorizontal: 32, paddingVertical: 14, marginTop: 24 },
+  heroCtaText: { fontSize: 12, fontWeight: '500', letterSpacing: 3, color: C.white, textTransform: 'uppercase' },
   expActions: { flexDirection: 'row', gap: 12, marginTop: 16 },
   viewBtn: { borderWidth: 1, borderColor: C.border, paddingHorizontal: 20, paddingVertical: 10 },
   viewBtnText: { fontSize: 11, fontWeight: '500', letterSpacing: 2, color: C.text, textTransform: 'uppercase' },

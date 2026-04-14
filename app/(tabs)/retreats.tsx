@@ -49,6 +49,11 @@ export default function RetreatsScreen() {
           Daily breathwork. Daily surf. Nourishing meals and beachfront accommodations.
           A small group of 12 in the world's most beautiful coastlines.
         </Text>
+        {!isAuthenticated && (
+          <TouchableOpacity style={s.heroCta} onPress={() => router.push('/auth/sign-up')}>
+            <Text style={s.heroCtaText}>Sign Up to Book</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {loading ? (
@@ -93,6 +98,11 @@ export default function RetreatsScreen() {
               </View>
               <Text style={s.retreatLocation}>{r.location}</Text>
               <Text style={s.retreatDates}>{r.dates}</Text>
+              {!isAuthenticated && (
+                <TouchableOpacity style={s.bookBtn} onPress={() => router.push('/auth/sign-up')}>
+                  <Text style={s.bookBtnText}>Book This Retreat</Text>
+                </TouchableOpacity>
+              )}
             </View>
           ))}
 
@@ -135,6 +145,8 @@ const s = StyleSheet.create({
   spotsWarning: { fontSize: 13, fontWeight: '500', color: '#C45A4A', marginTop: 6 },
   signupPrompt: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 20, marginTop: 16, borderTopWidth: 1, borderTopColor: C.border },
   signupText: { fontSize: 14, color: C.accent, fontWeight: '400' },
+  heroCta: { backgroundColor: C.dark, paddingHorizontal: 32, paddingVertical: 14, marginTop: 24 },
+  heroCtaText: { fontSize: 12, fontWeight: '500', letterSpacing: 3, color: C.white, textTransform: 'uppercase' },
   retreatActions: { flexDirection: 'row', gap: 12, marginTop: 16 },
   viewBtn: { borderWidth: 1, borderColor: C.border, paddingHorizontal: 20, paddingVertical: 10 },
   viewBtnText: { fontSize: 11, fontWeight: '500', letterSpacing: 2, color: C.text, textTransform: 'uppercase' },

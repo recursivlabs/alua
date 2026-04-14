@@ -44,6 +44,11 @@ export default function StudioScreen() {
           Live breathwork sessions, guided practices, and integration support.
           Continue your journey between retreats, or start one from home.
         </Text>
+        {!isAuthenticated && (
+          <TouchableOpacity style={s.heroCta} onPress={() => router.push('/auth/sign-up')}>
+            <Text style={s.heroCtaText}>Start Your Practice</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* Pricing */}
@@ -168,6 +173,8 @@ const s = StyleSheet.create({
   subscribeBtnDark: { alignSelf: 'center', borderWidth: 1, borderColor: C.white, paddingHorizontal: 36, paddingVertical: 14, marginTop: 24 },
   subscribeBtnText: { fontSize: 12, fontWeight: '500', letterSpacing: 3, color: C.white, textTransform: 'uppercase' },
 
+  heroCta: { backgroundColor: C.dark, paddingHorizontal: 32, paddingVertical: 14, marginTop: 24 },
+  heroCtaText: { fontSize: 12, fontWeight: '500', letterSpacing: 3, color: C.white, textTransform: 'uppercase' },
   featureRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, marginBottom: 14 },
   featureText: { fontSize: 15, lineHeight: 24, color: C.textLight, flex: 1 },
 
