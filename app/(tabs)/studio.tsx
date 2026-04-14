@@ -1,4 +1,4 @@
-import { ScrollView, View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Linking } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Linking, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -61,11 +61,9 @@ export default function StudioScreen() {
             <Text style={s.pricePer}>/ year</Text>
           </View>
         </View>
-        {!isAuthenticated && (
-          <TouchableOpacity style={s.subscribeBtnDark} onPress={() => router.push('/auth/sign-up')}>
-            <Text style={s.subscribeBtnText}>Start Your Practice</Text>
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity style={s.subscribeBtnDark} onPress={() => isAuthenticated ? Alert.alert('Coming Soon', 'Stripe subscription integration is being set up. You\'ll be able to subscribe directly from here soon.') : router.push('/auth/sign-up')}>
+          <Text style={s.subscribeBtnText}>{isAuthenticated ? 'Subscribe' : 'Start Your Practice'}</Text>
+        </TouchableOpacity>
       </View>
 
       {/* What you get */}

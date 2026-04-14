@@ -1,17 +1,33 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
 import { Platform } from 'react-native';
-import * as SecureStore from 'expo-secure-store';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Recursiv } from '@recursiv/sdk';
 import { anonSdk, createAuthedSdk, ORG_ID } from '@/lib/recursiv';
 
-const secureStorage = {
-  getItemAsync: (key: string): Promise<string | null> =>
-    Platform.OS === 'web' ? AsyncStorage.getItem(key) : SecureStore.getItemAsync(key),
-  setItemAsync: (key: string, value: string): Promise<void> =>
-    Platform.OS === 'web' ? AsyncStorage.setItem(key, value) : SecureStore.setItemAsync(key, value),
-  deleteItemAsync: (key: string): Promise<void> =>
-    Platform.OS === 'web' ? AsyncStorage.removeItem(key) : SecureStore.deleteItemAsync(key),
+// Direct localStorage on web, SecureStore on native
+const storage = {
+  async get(key: string): Promise<string | null> {
+    if (Platform.OS === 'web') {
+      return typeof window !== 'undefined' ? window.localStorage.getItem(key) : null;
+    }
+    const SecureStore = require('expo-secure-store');
+    return SecureStore.getItemAsync(key);
+  },
+  async set(key: string, value: string): Promise<void> {
+    if (Platform.OS === 'web') {
+      if (typeof window !== 'undefined') window.localStorage.setItem(key, value);
+      return;
+    }
+    const SecureStore = require('expo-secure-store');
+    await SecureStore.setItemAsync(key, value);
+  },
+  async remove(key: string): Promise<void> {
+    if (Platform.OS === 'web') {
+      if (typeof window !== 'undefined') window.localStorage.removeItem(key);
+      return;
+    }
+    const SecureStore = require('expo-secure-store');
+    await SecureStore.deleteItemAsync(key);
+  },
 };
 
 const API_KEY_SCOPES = [
@@ -48,7 +64,7 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-const KEYS = {
+const K = {
   apiKey: 'alua_api_key',
   user: 'alua_user',
   orgId: 'alua_org_id',
@@ -64,42 +80,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    restoreSession();
+    restore();
   }, []);
 
-  const restoreSession = async () => {
+  const restore = async () => {
     try {
-      const storedVersion = await secureStorage.getItemAsync(KEYS.version);
-      if (storedVersion !== AUTH_VERSION) {
-        await clearStorage();
-        await secureStorage.setItemAsync(KEYS.version, AUTH_VERSION);
+      const ver = await storage.get(K.version);
+      if (ver !== AUTH_VERSION) {
+        await clear();
+        await storage.set(K.version, AUTH_VERSION);
         setIsLoading(false);
         return;
       }
 
-      const [storedApiKey, storedUser] = await Promise.all([
-        secureStorage.getItemAsync(KEYS.apiKey),
-        secureStorage.getItemAsync(KEYS.user),
+      const [storedKey, storedUser, storedOrg] = await Promise.all([
+        storage.get(K.apiKey),
+        storage.get(K.user),
+        storage.get(K.orgId),
       ]);
-      const storedOrgId = await secureStorage.getItemAsync(KEYS.orgId);
 
-      if (storedApiKey && storedUser) {
-        const authedSdk = createAuthedSdk(storedApiKey);
+      if (storedKey && storedUser) {
+        const authedSdk = createAuthedSdk(storedKey);
         try {
           await authedSdk.users.me();
           setSdk(authedSdk);
           setUser(JSON.parse(storedUser));
-          setOrgId(storedOrgId);
+          setOrgId(storedOrg);
         } catch {
-          await clearStorage();
+          await clear();
         }
       }
     } catch (err) {
       console.error('[Auth] restore error:', err);
-      await clearStorage();
+      await clear();
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const persist = async (apiKey: string, authUser: AuthUser) => {
+    await Promise.all([
+      storage.set(K.apiKey, apiKey),
+      storage.set(K.user, JSON.stringify(authUser)),
+      storage.set(K.version, AUTH_VERSION),
+      storage.set(K.orgId, ORG_ID),
+    ]);
   };
 
   const signUp = useCallback(async (name: string, email: string, password: string) => {
@@ -107,7 +132,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       { name, email, password },
       { name: 'alua-' + Date.now(), scopes: [...API_KEY_SCOPES], organizationId: ORG_ID },
     );
-
     const authedSdk = createAuthedSdk(result.apiKey);
     const authUser: AuthUser = {
       id: result.user?.id || '',
@@ -115,14 +139,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email: result.user?.email || email,
       image: result.user?.image ?? null,
     };
-
-    await Promise.all([
-      secureStorage.setItemAsync(KEYS.apiKey, result.apiKey),
-      secureStorage.setItemAsync(KEYS.user, JSON.stringify(authUser)),
-      secureStorage.setItemAsync(KEYS.version, AUTH_VERSION),
-      secureStorage.setItemAsync(KEYS.orgId, ORG_ID),
-    ]);
-
+    await persist(result.apiKey, authUser);
     setSdk(authedSdk);
     setUser(authUser);
     setOrgId(ORG_ID);
@@ -133,7 +150,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       { email, password },
       { name: 'alua-' + Date.now(), scopes: [...API_KEY_SCOPES], organizationId: ORG_ID },
     );
-
     const authedSdk = createAuthedSdk(result.apiKey);
     const authUser: AuthUser = {
       id: result.user?.id || '',
@@ -141,21 +157,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email: result.user?.email || email,
       image: result.user?.image ?? null,
     };
-
-    await Promise.all([
-      secureStorage.setItemAsync(KEYS.apiKey, result.apiKey),
-      secureStorage.setItemAsync(KEYS.user, JSON.stringify(authUser)),
-      secureStorage.setItemAsync(KEYS.version, AUTH_VERSION),
-      secureStorage.setItemAsync(KEYS.orgId, ORG_ID),
-    ]);
-
+    await persist(result.apiKey, authUser);
     setSdk(authedSdk);
     setUser(authUser);
     setOrgId(ORG_ID);
   }, []);
 
   const signOut = useCallback(async () => {
-    await clearStorage();
+    await clear();
     setSdk(null);
     setUser(null);
     setOrgId(null);
@@ -174,10 +183,10 @@ export function useAuth() {
   return ctx;
 }
 
-async function clearStorage() {
+async function clear() {
   await Promise.all([
-    secureStorage.deleteItemAsync(KEYS.apiKey),
-    secureStorage.deleteItemAsync(KEYS.user),
-    secureStorage.deleteItemAsync(KEYS.orgId),
+    storage.remove(K.apiKey),
+    storage.remove(K.user),
+    storage.remove(K.orgId),
   ]);
 }

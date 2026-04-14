@@ -56,13 +56,21 @@ export default function ExperiencesScreen() {
       ) : (
         <View style={s.section}>
           {(hasDbData ? experiences : []).map((e, i) => (
-            <TouchableOpacity key={e.id} style={[s.expItem, i > 0 && { borderTopWidth: 1, borderTopColor: C.border }]} onPress={() => router.push(`/experience/${e.id}`)}>
+            <View key={e.id} style={[s.expItem, i > 0 && { borderTopWidth: 1, borderTopColor: C.border }]}>
               <Text style={s.expTitle}>{e.title}</Text>
               <View style={s.expMeta}>
                 <Text style={s.expLocation}>{e.location_name}</Text>
                 <Text style={s.expPrice}>{formatPrice(e.price_cents)}</Text>
               </View>
-            </TouchableOpacity>
+              <View style={s.expActions}>
+                <TouchableOpacity style={s.viewBtn} onPress={() => router.push(`/experience/${e.id}`)}>
+                  <Text style={s.viewBtnText}>View Details</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={s.bookBtn} onPress={() => router.push({ pathname: '/booking/checkout', params: { type: 'experience', id: e.id } })}>
+                  <Text style={s.bookBtnText}>Book Now</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           ))}
           {!hasDbData && STATIC.map((e, i) => (
             <View key={i} style={[s.expItem, i > 0 && { borderTopWidth: 1, borderTopColor: C.border }]}>
@@ -110,6 +118,11 @@ const s = StyleSheet.create({
   expPrice: { fontSize: 16, fontWeight: '400', color: C.text, letterSpacing: 1 },
   signupPrompt: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 20, marginTop: 16, borderTopWidth: 1, borderTopColor: C.border },
   signupText: { fontSize: 14, color: C.accent, fontWeight: '400' },
+  expActions: { flexDirection: 'row', gap: 12, marginTop: 16 },
+  viewBtn: { borderWidth: 1, borderColor: C.border, paddingHorizontal: 20, paddingVertical: 10 },
+  viewBtnText: { fontSize: 11, fontWeight: '500', letterSpacing: 2, color: C.text, textTransform: 'uppercase' },
+  bookBtn: { backgroundColor: C.dark, paddingHorizontal: 20, paddingVertical: 10 },
+  bookBtnText: { fontSize: 11, fontWeight: '500', letterSpacing: 2, color: C.white, textTransform: 'uppercase' },
   featureRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, marginBottom: 12 },
   featureText: { fontSize: 15, lineHeight: 24, color: C.textLight, flex: 1 },
 });

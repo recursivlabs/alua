@@ -90,10 +90,10 @@ export default function ProfileScreen() {
         experience_level: JSON.stringify({ surf: surfLevel, breathwork: breathworkLevel }),
       };
       if (profile) {
-        await dbQuery(ctx.sdk, `UPDATE guest_profiles SET full_name=$2, phone=$3, dietary=$4, medical=$5, emergency_contact=$6, experience_level=$7, updated_at=now() WHERE user_id=$1`,
+        await dbQuery(ctx.sdk, `UPDATE guest_profiles SET full_name=$2, phone=$3, dietary=$4::jsonb, medical=$5::jsonb, emergency_contact=$6::jsonb, experience_level=$7::jsonb, updated_at=now() WHERE user_id=$1`,
           [user.id, fullName, phone, data.dietary, data.medical, data.emergency_contact, data.experience_level]);
       } else {
-        await dbQuery(ctx.sdk, `INSERT INTO guest_profiles (user_id, full_name, phone, dietary, medical, emergency_contact, experience_level) VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+        await dbQuery(ctx.sdk, `INSERT INTO guest_profiles (user_id, full_name, phone, dietary, medical, emergency_contact, experience_level) VALUES ($1,$2,$3,$4::jsonb,$5::jsonb,$6::jsonb,$7::jsonb)`,
           [user.id, fullName, phone, data.dietary, data.medical, data.emergency_contact, data.experience_level]);
       }
       Alert.alert('Saved', 'Your profile has been updated.');

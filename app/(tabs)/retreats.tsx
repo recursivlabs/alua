@@ -61,17 +61,27 @@ export default function RetreatsScreen() {
             const dateStr = `${start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
             const spotsLeft = r.max_capacity - r.current_bookings;
             return (
-              <TouchableOpacity key={r.id} style={[s.retreatItem, i > 0 && { borderTopWidth: 1, borderTopColor: C.border }]} onPress={() => router.push(`/retreat/${r.id}`)}>
-                <View style={s.retreatHeader}>
-                  <Text style={s.retreatTitle}>{r.title}</Text>
-                  <Text style={s.retreatPrice}>{formatPrice(r.price_cents)}</Text>
+              <View key={r.id} style={[s.retreatItem, i > 0 && { borderTopWidth: 1, borderTopColor: C.border }]}>
+                <TouchableOpacity onPress={() => router.push(`/retreat/${r.id}`)}>
+                  <View style={s.retreatHeader}>
+                    <Text style={s.retreatTitle}>{r.title}</Text>
+                    <Text style={s.retreatPrice}>{formatPrice(r.price_cents)}</Text>
+                  </View>
+                  <Text style={s.retreatLocation}>{r.location_name}</Text>
+                  <Text style={s.retreatDates}>{dateStr}</Text>
+                  {spotsLeft <= 3 && spotsLeft > 0 && (
+                    <Text style={s.spotsWarning}>{spotsLeft} spots remaining</Text>
+                  )}
+                </TouchableOpacity>
+                <View style={s.retreatActions}>
+                  <TouchableOpacity style={s.viewBtn} onPress={() => router.push(`/retreat/${r.id}`)}>
+                    <Text style={s.viewBtnText}>View Details</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={s.bookBtn} onPress={() => router.push({ pathname: '/booking/checkout', params: { type: 'retreat', id: r.id } })}>
+                    <Text style={s.bookBtnText}>Book Now</Text>
+                  </TouchableOpacity>
                 </View>
-                <Text style={s.retreatLocation}>{r.location_name}</Text>
-                <Text style={s.retreatDates}>{dateStr}</Text>
-                {spotsLeft <= 3 && spotsLeft > 0 && (
-                  <Text style={s.spotsWarning}>{spotsLeft} spots remaining</Text>
-                )}
-              </TouchableOpacity>
+              </View>
             );
           })}
 
@@ -125,6 +135,11 @@ const s = StyleSheet.create({
   spotsWarning: { fontSize: 13, fontWeight: '500', color: '#C45A4A', marginTop: 6 },
   signupPrompt: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 20, marginTop: 16, borderTopWidth: 1, borderTopColor: C.border },
   signupText: { fontSize: 14, color: C.accent, fontWeight: '400' },
+  retreatActions: { flexDirection: 'row', gap: 12, marginTop: 16 },
+  viewBtn: { borderWidth: 1, borderColor: C.border, paddingHorizontal: 20, paddingVertical: 10 },
+  viewBtnText: { fontSize: 11, fontWeight: '500', letterSpacing: 2, color: C.text, textTransform: 'uppercase' },
+  bookBtn: { backgroundColor: C.dark, paddingHorizontal: 20, paddingVertical: 10 },
+  bookBtnText: { fontSize: 11, fontWeight: '500', letterSpacing: 2, color: C.white, textTransform: 'uppercase' },
   includedRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, marginBottom: 12 },
   includedText: { fontSize: 15, lineHeight: 24, color: C.textLight, flex: 1 },
 });
