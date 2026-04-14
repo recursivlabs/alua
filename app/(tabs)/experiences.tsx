@@ -50,9 +50,6 @@ export default function ExperiencesScreen() {
           A single day woven together. Breathwork, surf, and a shared meal.
           The perfect introduction to the Alua practice.
         </Text>
-        {!isAuthenticated && (
-          <Cta title="Sign Up to Book" onPress={() => router.push('/auth/sign-up')} style={{ marginTop: 32 }} />
-        )}
       </View>
 
       {loading ? (
@@ -67,8 +64,8 @@ export default function ExperiencesScreen() {
                 <Text style={s.expPrice}>{formatPrice(e.price_cents)}</Text>
               </View>
               <View style={s.expActions}>
-                <Cta title="View Details" variant="secondary" onPress={() => router.push(`/experience/${e.id}`)} style={{ flex: 1, marginTop: 0 }} />
-                <Cta title="Book Now" onPress={() => router.push({ pathname: '/booking/checkout', params: { type: 'experience', id: e.id } })} style={{ flex: 1, marginTop: 0 }} />
+                <Cta title="View Details" variant="secondary" onPress={() => router.push(`/experience/${e.id}`)} style={{ marginTop: 0 }} />
+                <Cta title="Book Now" onPress={() => router.push({ pathname: '/booking/checkout', params: { type: 'experience', id: e.id } })} style={{ marginTop: 0 }} />
               </View>
             </View>
           ))}

@@ -45,9 +45,6 @@ export default function StudioScreen() {
           Live breathwork sessions, guided practices, and integration support.
           Continue your journey between retreats, or start one from home.
         </Text>
-        {!isAuthenticated && (
-          <Cta title="Start Your Practice" onPress={() => router.push('/auth/sign-up')} style={{ marginTop: 32 }} />
-        )}
       </View>
 
       {/* Pricing */}
@@ -69,7 +66,7 @@ export default function StudioScreen() {
           title={isAuthenticated ? 'Subscribe' : 'Start Your Practice'}
           variant="secondary"
           onPress={() => isAuthenticated ? Alert.alert('Coming Soon', 'Stripe subscription is being set up. You\'ll be able to subscribe directly from here soon.') : router.push('/auth/sign-up')}
-          style={{ borderColor: '#3D5A65', alignSelf: 'center', marginTop: 24 }}
+          style={{ alignSelf: 'center', marginTop: 24 }}
         />
       </View>
 

@@ -50,9 +50,6 @@ export default function RetreatsScreen() {
           Daily breathwork. Daily surf. Nourishing meals and beachfront accommodations.
           A small group of 12 in the world's most beautiful coastlines.
         </Text>
-        {!isAuthenticated && (
-          <Cta title="Sign Up to Book" onPress={() => router.push('/auth/sign-up')} style={{ marginTop: 32 }} />
-        )}
       </View>
 
       {loading ? (
@@ -78,8 +75,8 @@ export default function RetreatsScreen() {
                   )}
                 </TouchableOpacity>
                 <View style={s.retreatActions}>
-                  <Cta title="View Details" variant="secondary" onPress={() => router.push(`/retreat/${r.id}`)} style={{ flex: 1, marginTop: 0 }} />
-                  <Cta title="Book Now" onPress={() => router.push({ pathname: '/booking/checkout', params: { type: 'retreat', id: r.id } })} style={{ flex: 1, marginTop: 0 }} />
+                  <Cta title="View Details" variant="secondary" onPress={() => router.push(`/retreat/${r.id}`)} style={{ marginTop: 0 }} />
+                  <Cta title="Book Now" onPress={() => router.push({ pathname: '/booking/checkout', params: { type: 'retreat', id: r.id } })} style={{ marginTop: 0 }} />
                 </View>
               </View>
             );

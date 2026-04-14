@@ -70,7 +70,7 @@ export default function HomeScreen() {
                   <Text style={s.offeringTitle}>{o.title}</Text>
                   <Text style={s.offeringDesc}>{o.desc}</Text>
                   <Text style={s.offeringPrice}>{o.price}</Text>
-                  <Cta title={o.cta} variant="secondary" onPress={() => router.push(o.route as any)} style={{ borderColor: '#3D5A65', marginTop: 16 }} />
+                  <Cta title={o.cta} variant="secondary" onPress={() => router.push(o.route as any)} style={{ marginTop: 16 }} />
                 </View>
               </View>
             ))}
