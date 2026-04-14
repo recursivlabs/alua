@@ -28,6 +28,8 @@ const NAV_ITEMS: NavItem[] = [
   { name: 'retreats', label: 'Retreats', icon: 'compass-outline', activeIcon: 'compass' },
   { name: 'experiences', label: 'Experiences', icon: 'sunny-outline', activeIcon: 'sunny' },
   { name: 'studio', label: 'Studio', icon: 'play-circle-outline', activeIcon: 'play-circle' },
+  { name: 'about', label: 'About', icon: 'leaf-outline', activeIcon: 'leaf' },
+  { name: 'faq', label: 'FAQ', icon: 'help-circle-outline', activeIcon: 'help-circle' },
   { name: 'profile', label: 'Profile', icon: 'person-outline', activeIcon: 'person' },
   { name: 'admin', label: 'Admin', icon: 'settings-outline', activeIcon: 'settings', adminOnly: true },
 ];

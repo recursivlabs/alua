@@ -26,6 +26,8 @@ export default function TabLayout() {
             <Tabs.Screen name="retreats" />
             <Tabs.Screen name="experiences" />
             <Tabs.Screen name="studio" />
+            <Tabs.Screen name="about" />
+            <Tabs.Screen name="faq" />
             <Tabs.Screen name="profile" />
             <Tabs.Screen name="admin" options={{ href: isAdmin ? undefined : null }} />
           </Tabs>
@@ -54,6 +56,8 @@ export default function TabLayout() {
       <Tabs.Screen name="retreats" options={{ title: 'Retreats', tabBarIcon: ({ color }) => <Ionicons name="compass-outline" size={22} color={color} /> }} />
       <Tabs.Screen name="experiences" options={{ title: 'Experiences', tabBarIcon: ({ color }) => <Ionicons name="sunny-outline" size={22} color={color} /> }} />
       <Tabs.Screen name="studio" options={{ title: 'Studio', tabBarIcon: ({ color }) => <Ionicons name="play-circle-outline" size={22} color={color} /> }} />
+      <Tabs.Screen name="about" options={{ href: null }} />
+      <Tabs.Screen name="faq" options={{ href: null }} />
       <Tabs.Screen name="profile" options={{ title: 'Profile', tabBarIcon: ({ color }) => <Ionicons name="person-outline" size={22} color={color} /> }} />
       <Tabs.Screen name="admin" options={{ href: isAdmin ? undefined : null, title: 'Admin', tabBarIcon: ({ color }) => <Ionicons name="settings-outline" size={22} color={color} /> }} />
     </Tabs>
