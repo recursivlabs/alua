@@ -9,6 +9,7 @@ import { STUDIO_PRICING, formatPrice } from '@/constants/pricing';
 import { useState, useEffect } from 'react';
 import type { StudioContent } from '@/hooks/useStudioContent';
 import Cta from '@/components/common/Cta';
+import { showUnderConstruction } from '@/lib/toast';
 
 const C = {
   bg: '#FAF7F4', text: '#1A1A1A', textLight: '#6B6560', textMuted: '#A09890',
@@ -65,7 +66,7 @@ export default function StudioScreen() {
         <Cta
           title={isAuthenticated ? 'Subscribe' : 'Start Your Practice'}
           variant="secondary"
-          onPress={() => isAuthenticated ? Alert.alert('Coming Soon', 'Stripe subscription is being set up. You\'ll be able to subscribe directly from here soon.') : router.push('/auth/sign-up')}
+          onPress={() => isAuthenticated ? showUnderConstruction() : router.push('/auth/sign-up')}
           style={{ alignSelf: 'center', marginTop: 24 }}
         />
       </View>

@@ -10,6 +10,7 @@ import { EXPERIENCE_INCLUDED } from '@/constants/content';
 import { useState, useEffect } from 'react';
 import type { Experience } from '@/hooks/useExperiences';
 import Cta from '@/components/common/Cta';
+import { showUnderConstruction } from '@/lib/toast';
 
 const C = {
   bg: '#FAF7F4', text: '#1A1A1A', textLight: '#6B6560', textMuted: '#A09890',
@@ -64,8 +65,8 @@ export default function ExperiencesScreen() {
                 <Text style={s.expPrice}>{formatPrice(e.price_cents)}</Text>
               </View>
               <View style={s.expActions}>
-                <Cta title="View Details" variant="secondary" onPress={() => router.push(`/experience/${e.id}`)} style={{ marginTop: 0 }} />
-                <Cta title="Book Now" onPress={() => router.push({ pathname: '/booking/checkout', params: { type: 'experience', id: e.id } })} style={{ marginTop: 0 }} />
+                <Cta title="View Details" variant="secondary" onPress={() => showUnderConstruction()} style={{ marginTop: 0 }} />
+                <Cta title="Book Now" onPress={() => showUnderConstruction()} style={{ marginTop: 0 }} />
               </View>
             </View>
           ))}
@@ -78,7 +79,7 @@ export default function ExperiencesScreen() {
               </View>
               <Cta
                 title={isAuthenticated ? "Book This Experience" : "Sign Up to Book"}
-                onPress={() => isAuthenticated ? router.push('/(tabs)/experiences') : router.push('/auth/sign-up')}
+                onPress={() => isAuthenticated ? showUnderConstruction() : router.push('/auth/sign-up')}
                 style={{ marginTop: 20 }}
               />
             </View>
