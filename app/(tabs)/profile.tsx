@@ -10,6 +10,7 @@ import { formatPrice } from '@/constants/pricing';
 import type { Booking } from '@/hooks/useBookings';
 import type { GuestProfile } from '@/hooks/useGuestProfile';
 import Cta from '@/components/common/Cta';
+import { showToast } from '@/lib/toast';
 
 const C = {
   bg: '#FAF7F4', text: '#1A1A1A', textLight: '#6B6560', textMuted: '#A09890',
@@ -98,6 +99,7 @@ export default function ProfileScreen() {
       }
       setProfile({ ...profile, full_name: fullName, phone } as any);
       setEditing(false);
+      showToast('Profile saved!');
     } catch (err: any) {
       Alert.alert('Error', err.message);
     } finally {
