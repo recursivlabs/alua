@@ -1,8 +1,9 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, Modal, FlatList,
   KeyboardAvoidingView, Platform, StyleSheet, useWindowDimensions,
 } from 'react-native';
+import Markdown from 'react-native-markdown-display';
 import { useAiChat, ChatMessage } from '@/hooks/useAiChat';
 
 const C = {
@@ -18,6 +19,22 @@ const C = {
 
 const GREETING = "Hi! I'm the Alua Guide. Ask me anything about our retreats, breathwork, or surfing.";
 
+const markdownStyles = {
+  body: { fontSize: 15, lineHeight: 22, color: C.text },
+  paragraph: { marginTop: 0, marginBottom: 6 },
+  strong: { fontWeight: '600' as const },
+  bullet_list: { marginVertical: 4 },
+  ordered_list: { marginVertical: 4 },
+  list_item: { marginVertical: 2 },
+  link: { color: C.accent },
+};
+
+const markdownStylesUser = {
+  ...markdownStyles,
+  body: { ...markdownStyles.body, color: '#fff' },
+  link: { color: '#ddd' },
+};
+
 export default function ChatWidget() {
   const { messages, isStreaming, sendMessage } = useAiChat();
   const [visible, setVisible] = useState(false);
@@ -25,6 +42,13 @@ export default function ChatWidget() {
   const listRef = useRef<FlatList<ChatMessage>>(null);
   const { width } = useWindowDimensions();
   const isWide = width > 768;
+
+  // Auto-scroll when messages change
+  useEffect(() => {
+    if (messages.length > 0) {
+      setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 100);
+    }
+  }, [messages]);
 
   const handleSend = () => {
     const text = draft.trim();
@@ -39,8 +63,10 @@ export default function ChatWidget() {
       <View style={[s.bubble, isUser ? s.userBubble : s.assistantBubble]}>
         {item.isStreaming ? (
           <Text style={[s.bubbleText, { color: C.textMuted }]}>Thinking...</Text>
+        ) : isUser ? (
+          <Markdown style={markdownStylesUser}>{item.content}</Markdown>
         ) : (
-          <Text style={[s.bubbleText, { color: isUser ? '#fff' : C.text }]}>{item.content}</Text>
+          <Markdown style={markdownStyles}>{item.content}</Markdown>
         )}
       </View>
     );
@@ -76,10 +102,11 @@ export default function ChatWidget() {
               contentContainerStyle={s.messageList}
               ListHeaderComponent={
                 <View style={[s.bubble, s.assistantBubble]}>
-                  <Text style={[s.bubbleText, { color: C.text }]}>{GREETING}</Text>
+                  <Markdown style={markdownStyles}>{GREETING}</Markdown>
                 </View>
               }
               onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: true })}
+              onLayout={() => listRef.current?.scrollToEnd({ animated: false })}
             />
 
             {/* Input */}
@@ -157,8 +184,6 @@ const s = StyleSheet.create({
     bottom: 24,
     right: 24,
     borderRadius: 16,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
   },
 
   header: {
