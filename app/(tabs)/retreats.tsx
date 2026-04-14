@@ -28,9 +28,9 @@ export default function RetreatsScreen() {
       {/* Sample retreats */}
       <View style={s.section}>
         {[
-          { title: 'Winter Healing', location: 'Sri Lanka — South Coast', dates: 'Jan 15 – 20, 2027', price: '$1,800' },
+          { title: 'Winter Healing', location: 'Sri Lanka, South Coast', dates: 'Jan 15 - 20, 2027', price: '$1,800' },
           { title: 'Presence & Play', location: 'Lombok, Indonesia', dates: 'May 10 – 15, 2027', price: '$2,200' },
-          { title: 'Ocean & Breath', location: 'Costa Rica — Pacific', dates: 'Feb 20 – 25, 2027', price: '$2,500' },
+          { title: 'Ocean & Breath', location: 'Costa Rica, Pacific Coast', dates: 'Feb 20 - 25, 2027', price: '$2,500' },
         ].map((r, i) => (
           <View key={i} style={[s.retreatItem, i > 0 && { borderTopWidth: 1, borderTopColor: C.border }]}>
             <View style={s.retreatHeader}>
@@ -49,7 +49,7 @@ export default function RetreatsScreen() {
         <View style={{ marginTop: 20 }}>
           {RETREAT_INCLUDED.map((item, i) => (
             <View key={i} style={s.includedRow}>
-              <Text style={s.includedCheck}>—</Text>
+              <Text style={s.includedCheck}>✓</Text>
               <Text style={s.includedText}>{item}</Text>
             </View>
           ))}

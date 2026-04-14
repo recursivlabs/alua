@@ -1,9 +1,10 @@
 import { ScrollView, View, Text, StyleSheet, TouchableOpacity, useWindowDimensions, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
 
-const COLORS = {
+const C = {
   bg: '#FAF7F4',
   text: '#1A1A1A',
   textLight: '#6B6560',
@@ -27,476 +28,214 @@ export default function HomeScreen() {
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor: COLORS.bg }}
+      style={{ flex: 1, backgroundColor: C.bg }}
       contentContainerStyle={{ paddingBottom: insets.bottom + 60 }}
       showsVerticalScrollIndicator={false}>
 
-      {/* ── Hero ── */}
-      <View style={[styles.hero, { minHeight: heroHeight, paddingTop: insets.top }]}>
-        <View style={styles.heroInner}>
-          <Text style={[styles.brandMark, isWide && styles.brandMarkLarge]}>ALUA</Text>
-          <View style={styles.heroLine} />
-          <Text style={[styles.heroTagline, isWide && styles.heroTaglineLarge]}>
+      {/* Hero */}
+      <View style={[s.hero, { minHeight: heroHeight, paddingTop: insets.top }]}>
+        <View style={s.heroInner}>
+          <Text style={[s.brandMark, isWide && s.brandMarkLarge]}>ALUA</Text>
+          <View style={s.heroLine} />
+          <Text style={[s.heroTagline, isWide && s.heroTaglineLarge]}>
             Breathwork & Surf Retreats
           </Text>
-          <Text style={[styles.heroSub]}>
+          <Text style={s.heroSub}>
             Sri Lanka  ·  Indonesia  ·  Costa Rica
           </Text>
         </View>
         <TouchableOpacity
-          style={styles.heroCta}
-          onPress={() => isAuthenticated ? router.push('/(tabs)/retreats') : router.push('/auth/sign-up')}>
-          <Text style={styles.heroCtaText}>Explore Retreats</Text>
+          style={s.heroCta}
+          onPress={() => router.push('/(tabs)/retreats')}>
+          <Text style={s.heroCtaText}>Explore Retreats</Text>
         </TouchableOpacity>
-        <Text style={styles.scrollHint}>↓</Text>
+        <Text style={s.scrollHint}>↓</Text>
       </View>
 
-      {/* ── Philosophy ── */}
-      <View style={[styles.section, styles.philosophySection]}>
-        <View style={[styles.contentBlock, isWide && styles.contentBlockWide]}>
-          <Text style={styles.sectionEyebrow}>THE PRACTICE</Text>
-          <Text style={[styles.philosophyText, isWide && styles.philosophyTextLarge]}>
+      {/* Philosophy */}
+      <View style={[s.section, s.philosophySection]}>
+        <View style={[s.contentBlock, isWide && s.contentBlockWide]}>
+          <Text style={s.eyebrow}>THE PRACTICE</Text>
+          <Text style={[s.philosophyText, isWide && s.philosophyTextLarge]}>
             We create containers for healing, growth, and transformation through surf, breathwork, and connection to the ocean.
           </Text>
-          <Text style={styles.philosophyBody}>
+          <Text style={s.philosophyBody}>
             Unlike typical retreats focused on aesthetics or performance, Alua weaves breath and surfing together as integrated practices for presence. The ocean becomes the teacher. The breath becomes the anchor. What emerges is yours.
           </Text>
         </View>
       </View>
 
-      {/* ── Offerings ── */}
-      <View style={[styles.section, { backgroundColor: COLORS.dark }]}>
-        <View style={[styles.contentBlock, isWide && styles.contentBlockWide]}>
-          <Text style={[styles.sectionEyebrow, { color: COLORS.accent }]}>OFFERINGS</Text>
-
-          <View style={[styles.offeringsGrid, isWide && styles.offeringsGridWide]}>
-            <View style={styles.offering}>
-              <Text style={styles.offeringNumber}>01</Text>
-              <Text style={styles.offeringTitle}>Retreats</Text>
-              <Text style={styles.offeringDesc}>
-                5 nights, 6 days. Daily breathwork and surf. Nourishing meals, beachfront accommodations, and a small community of 12.
-              </Text>
-              <Text style={styles.offeringPrice}>From $1,800</Text>
-            </View>
-
-            <View style={[styles.offeringDivider, isWide && styles.offeringDividerWide]} />
-
-            <View style={styles.offering}>
-              <Text style={styles.offeringNumber}>02</Text>
-              <Text style={styles.offeringTitle}>Experiences</Text>
-              <Text style={styles.offeringDesc}>
-                One day. Breathwork session, guided surf lesson, board rental, and a shared meal. The perfect introduction.
-              </Text>
-              <Text style={styles.offeringPrice}>From $95</Text>
-            </View>
-
-            <View style={[styles.offeringDivider, isWide && styles.offeringDividerWide]} />
-
-            <View style={styles.offering}>
-              <Text style={styles.offeringNumber}>03</Text>
-              <Text style={styles.offeringTitle}>Online Studio</Text>
-              <Text style={styles.offeringDesc}>
-                Live breathwork sessions and a full library of guided practices. Continue your journey between retreats.
-              </Text>
-              <Text style={styles.offeringPrice}>$22 / month</Text>
-            </View>
+      {/* Offerings */}
+      <View style={[s.section, { backgroundColor: C.dark }]}>
+        <View style={[s.contentBlock, isWide && s.contentBlockWide]}>
+          <Text style={[s.eyebrow, { color: C.accent }]}>OFFERINGS</Text>
+          <View style={[s.offeringsGrid, isWide && s.offeringsGridWide]}>
+            {[
+              { num: '01', title: 'Retreats', desc: '5 nights, 6 days. Daily breathwork and surf. Nourishing meals, beachfront accommodations, and a small community of 12.', price: 'From $1,800', icon: 'compass-outline' as const },
+              { num: '02', title: 'Experiences', desc: 'One day. Breathwork session, guided surf lesson, board rental, and a shared meal. The perfect introduction.', price: 'From $95', icon: 'sunny-outline' as const },
+              { num: '03', title: 'Online Studio', desc: 'Live breathwork sessions and a full library of guided practices. Continue your journey between retreats.', price: '$22 / month', icon: 'play-circle-outline' as const },
+            ].map((o, i) => (
+              <View key={o.num}>
+                {i > 0 && <View style={[s.offeringDivider, isWide && s.offeringDividerWide]} />}
+                <View style={s.offering}>
+                  <View style={s.offeringHeader}>
+                    <Text style={s.offeringNumber}>{o.num}</Text>
+                    <Ionicons name={o.icon} size={20} color={C.accent} style={{ opacity: 0.6 }} />
+                  </View>
+                  <Text style={s.offeringTitle}>{o.title}</Text>
+                  <Text style={s.offeringDesc}>{o.desc}</Text>
+                  <Text style={s.offeringPrice}>{o.price}</Text>
+                </View>
+              </View>
+            ))}
           </View>
         </View>
       </View>
 
-      {/* ── Locations ── */}
-      <View style={[styles.section, { backgroundColor: COLORS.cream }]}>
-        <View style={[styles.contentBlock, isWide && styles.contentBlockWide]}>
-          <Text style={[styles.sectionEyebrow, { color: COLORS.accent }]}>LOCATIONS</Text>
-          <Text style={[styles.sectionHeadline]}>We follow the seasons</Text>
-          <Text style={[styles.sectionBody, { marginBottom: 48 }]}>
-            Each location opens when the ocean is right — warm water, clean swells, and the conditions for transformation.
+      {/* Locations */}
+      <View style={[s.section, { backgroundColor: C.cream }]}>
+        <View style={[s.contentBlock, isWide && s.contentBlockWide]}>
+          <Text style={[s.eyebrow, { color: C.accent }]}>LOCATIONS</Text>
+          <Text style={s.sectionHeadline}>We follow the seasons</Text>
+          <Text style={[s.sectionBody, { marginBottom: 48 }]}>
+            Each location opens when the ocean is right. Warm water, clean swells, and the conditions for transformation.
           </Text>
 
-          <View style={[styles.locationsGrid, isWide && styles.locationsGridWide]}>
+          <View style={[s.locationsGrid, isWide && s.locationsGridWide]}>
             {[
-              { name: 'Sri Lanka', region: 'South Coast', season: 'November – April', detail: 'Weligama & Mirissa. Warm Indian Ocean swells, uncrowded points, the rhythm of slowing down.' },
-              { name: 'Lombok', region: 'Indonesia', season: 'April – October', detail: 'East of Bali, worlds apart. Selong Belanak\'s crescent bay — beginner-friendly, raw, intimate.' },
-              { name: 'Costa Rica', region: 'Pacific Coast', season: 'December – April', detail: 'Nosara & Santa Teresa. Offshore winds, warm water, a community drawn to intentional living.' },
+              { name: 'Sri Lanka', region: 'South Coast', season: 'November to April', detail: 'Weligama & Mirissa. Warm Indian Ocean swells, uncrowded points, the rhythm of slowing down.', icon: 'water-outline' as const },
+              { name: 'Lombok', region: 'Indonesia', season: 'April to October', detail: 'East of Bali, worlds apart. Selong Belanak\'s crescent bay. Beginner-friendly, raw, intimate.', icon: 'leaf-outline' as const },
+              { name: 'Costa Rica', region: 'Pacific Coast', season: 'December to April', detail: 'Nosara & Santa Teresa. Offshore winds, warm water, a community drawn to intentional living.', icon: 'sunny-outline' as const },
             ].map((loc, i) => (
-              <View key={loc.name} style={[styles.locationItem, i > 0 && styles.locationItemBorder]}>
-                <Text style={styles.locationName}>{loc.name}</Text>
-                <Text style={styles.locationRegion}>{loc.region}</Text>
-                <Text style={styles.locationSeason}>{loc.season}</Text>
-                <Text style={styles.locationDetail}>{loc.detail}</Text>
+              <View key={loc.name} style={[s.locationItem, isWide ? (i > 0 ? { borderLeftWidth: 1, borderLeftColor: C.border, paddingLeft: 32 } : {}) : (i > 0 ? { borderTopWidth: 1, borderTopColor: C.border } : {})]}>
+                <View style={s.locationIconRow}>
+                  <View style={s.locationIconCircle}>
+                    <Ionicons name={loc.icon} size={20} color={C.accent} />
+                  </View>
+                </View>
+                <Text style={s.locationName}>{loc.name}</Text>
+                <Text style={s.locationRegion}>{loc.region}</Text>
+                <Text style={s.locationSeason}>{loc.season}</Text>
+                <Text style={s.locationDetail}>{loc.detail}</Text>
               </View>
             ))}
           </View>
         </View>
       </View>
 
-      {/* ── Values ── */}
-      <View style={styles.section}>
-        <View style={[styles.contentBlock, isWide && styles.contentBlockWide]}>
-          <Text style={[styles.sectionEyebrow, { color: COLORS.accent }]}>VALUES</Text>
-          <View style={[styles.valuesGrid, isWide && styles.valuesGridWide]}>
+      {/* Values */}
+      <View style={s.section}>
+        <View style={[s.contentBlock, isWide && s.contentBlockWide]}>
+          <Text style={[s.eyebrow, { color: C.accent }]}>VALUES</Text>
+          <View style={[s.valuesGrid, isWide && s.valuesGridWide]}>
             {[
-              { title: 'Community', body: 'One of the most essential nutrients to our collective healing. Every experience is designed around connection — to ourselves, each other, and the natural world.' },
-              { title: 'Sustainability', body: 'Living in deep alignment with nature. Seasonal, slow, and in rhythm. We don\'t force growth — we let it emerge when conditions are right.' },
-              { title: 'Service', body: 'At the heart of everything. We create spaces and support that facilitate genuine growth, not performance. Plan meticulously, then hold that plan loosely.' },
+              { title: 'Community', body: 'One of the most essential nutrients to our collective healing. Every experience is designed around connection to ourselves, each other, and the natural world.', icon: 'people-outline' as const },
+              { title: 'Sustainability', body: 'Living in deep alignment with nature. Seasonal, slow, and in rhythm. We don\'t force growth. We let it emerge when conditions are right.', icon: 'earth-outline' as const },
+              { title: 'Service', body: 'At the heart of everything. We create spaces and support that facilitate genuine growth, not performance. Plan meticulously, then hold that plan loosely.', icon: 'heart-outline' as const },
             ].map((v) => (
-              <View key={v.title} style={styles.valueItem}>
-                <Text style={styles.valueTitle}>{v.title}</Text>
-                <Text style={styles.valueBody}>{v.body}</Text>
+              <View key={v.title} style={s.valueItem}>
+                <View style={s.valueIconCircle}>
+                  <Ionicons name={v.icon} size={22} color={C.accent} />
+                </View>
+                <Text style={s.valueTitle}>{v.title}</Text>
+                <Text style={s.valueBody}>{v.body}</Text>
               </View>
             ))}
           </View>
         </View>
       </View>
 
-      {/* ── Final CTA ── */}
-      <View style={[styles.section, styles.ctaSection]}>
-        <View style={styles.contentBlock}>
-          <Text style={[styles.ctaHeadline, isWide && styles.ctaHeadlineLarge]}>
+      {/* Final CTA */}
+      <View style={[s.section, s.ctaSection]}>
+        <View style={s.contentBlock}>
+          <Text style={[s.ctaHeadline, isWide && s.ctaHeadlineLarge]}>
             Come as you are.
           </Text>
-          <Text style={styles.ctaSub}>
+          <Text style={s.ctaSub}>
             No surf experience needed. No flexibility required.{'\n'}Just an open heart and willingness to slow down.
           </Text>
           <TouchableOpacity
-            style={styles.ctaButton}
+            style={s.ctaButton}
             onPress={() => isAuthenticated ? router.push('/(tabs)/retreats') : router.push('/auth/sign-up')}>
-            <Text style={styles.ctaButtonText}>Begin</Text>
+            <Text style={s.ctaButtonText}>Begin</Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* ── Footer ── */}
-      <View style={styles.footer}>
-        <Text style={styles.footerBrand}>ALUA</Text>
-        <Text style={styles.footerTagline}>Breathwork & Surf Retreats</Text>
-        <View style={styles.footerDivider} />
-        <Text style={styles.footerCopy}>Sri Lanka  ·  Indonesia  ·  Costa Rica</Text>
+      {/* Footer */}
+      <View style={s.footer}>
+        <Text style={s.footerBrand}>ALUA</Text>
+        <Text style={s.footerTagline}>Breathwork & Surf Retreats</Text>
+        <View style={s.footerDivider} />
+        <Text style={s.footerCopy}>Sri Lanka  ·  Indonesia  ·  Costa Rica</Text>
       </View>
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
-  /* ── Hero ── */
-  hero: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 32,
-    backgroundColor: COLORS.bg,
-  },
-  heroInner: {
-    alignItems: 'center',
-  },
-  brandMark: {
-    fontSize: 56,
-    fontWeight: '200',
-    letterSpacing: 24,
-    color: COLORS.text,
-    marginBottom: 20,
-  },
-  brandMarkLarge: {
-    fontSize: 80,
-    letterSpacing: 36,
-  },
-  heroLine: {
-    width: 40,
-    height: 1,
-    backgroundColor: COLORS.accent,
-    marginBottom: 20,
-  },
-  heroTagline: {
-    fontSize: 15,
-    fontWeight: '400',
-    letterSpacing: 4,
-    color: COLORS.textLight,
-    textTransform: 'uppercase',
-    textAlign: 'center',
-  },
-  heroTaglineLarge: {
-    fontSize: 17,
-    letterSpacing: 6,
-  },
-  heroSub: {
-    fontSize: 13,
-    letterSpacing: 3,
-    color: COLORS.textMuted,
-    textTransform: 'uppercase',
-    marginTop: 12,
-    textAlign: 'center',
-  },
-  heroCta: {
-    marginTop: 48,
-    borderWidth: 1,
-    borderColor: COLORS.text,
-    paddingHorizontal: 36,
-    paddingVertical: 14,
-    borderRadius: 0,
-  },
-  heroCtaText: {
-    fontSize: 12,
-    fontWeight: '500',
-    letterSpacing: 3,
-    color: COLORS.text,
-    textTransform: 'uppercase',
-  },
-  scrollHint: {
-    position: 'absolute',
-    bottom: 32,
-    fontSize: 18,
-    color: COLORS.textMuted,
-  },
+const s = StyleSheet.create({
+  hero: { justifyContent: 'center', alignItems: 'center', paddingHorizontal: 32, backgroundColor: C.bg },
+  heroInner: { alignItems: 'center' },
+  brandMark: { fontSize: 56, fontWeight: '200', letterSpacing: 24, color: C.text, marginBottom: 20, paddingLeft: 24 },
+  brandMarkLarge: { fontSize: 80, letterSpacing: 36, paddingLeft: 36 },
+  heroLine: { width: 40, height: 1, backgroundColor: C.accent, marginBottom: 20 },
+  heroTagline: { fontSize: 15, fontWeight: '400', letterSpacing: 4, color: C.textLight, textTransform: 'uppercase', textAlign: 'center', paddingLeft: 4 },
+  heroTaglineLarge: { fontSize: 17, letterSpacing: 6, paddingLeft: 6 },
+  heroSub: { fontSize: 13, letterSpacing: 3, color: C.textMuted, textTransform: 'uppercase', marginTop: 12, textAlign: 'center', paddingLeft: 3 },
+  heroCta: { marginTop: 48, borderWidth: 1, borderColor: C.text, paddingHorizontal: 36, paddingVertical: 14 },
+  heroCtaText: { fontSize: 12, fontWeight: '500', letterSpacing: 3, color: C.text, textTransform: 'uppercase' },
+  scrollHint: { position: 'absolute', bottom: 32, fontSize: 18, color: C.textMuted },
 
-  /* ── Sections ── */
-  section: {
-    paddingVertical: 80,
-    paddingHorizontal: 32,
-  },
-  contentBlock: {
-    maxWidth: 720,
-    alignSelf: 'center',
-    width: '100%',
-  },
-  contentBlockWide: {
-    maxWidth: 1080,
-  },
-  sectionEyebrow: {
-    fontSize: 11,
-    fontWeight: '600',
-    letterSpacing: 4,
-    color: COLORS.textMuted,
-    textTransform: 'uppercase',
-    marginBottom: 20,
-  },
-  sectionHeadline: {
-    fontSize: 32,
-    fontWeight: '300',
-    letterSpacing: -0.5,
-    color: COLORS.text,
-    lineHeight: 42,
-    marginBottom: 16,
-  },
-  sectionBody: {
-    fontSize: 16,
-    fontWeight: '400',
-    lineHeight: 28,
-    color: COLORS.textLight,
-  },
+  section: { paddingVertical: 80, paddingHorizontal: 32 },
+  contentBlock: { maxWidth: 720, alignSelf: 'center', width: '100%' },
+  contentBlockWide: { maxWidth: 1080 },
+  eyebrow: { fontSize: 11, fontWeight: '600', letterSpacing: 4, color: C.textMuted, textTransform: 'uppercase', marginBottom: 20 },
+  sectionHeadline: { fontSize: 32, fontWeight: '300', letterSpacing: -0.5, color: C.text, lineHeight: 42, marginBottom: 16 },
+  sectionBody: { fontSize: 16, fontWeight: '400', lineHeight: 28, color: C.textLight },
 
-  /* ── Philosophy ── */
-  philosophySection: {
-    paddingVertical: 100,
-    backgroundColor: COLORS.bg,
-  },
-  philosophyText: {
-    fontSize: 28,
-    fontWeight: '300',
-    lineHeight: 42,
-    color: COLORS.text,
-    letterSpacing: -0.3,
-    marginBottom: 24,
-  },
-  philosophyTextLarge: {
-    fontSize: 36,
-    lineHeight: 52,
-  },
-  philosophyBody: {
-    fontSize: 16,
-    fontWeight: '400',
-    lineHeight: 28,
-    color: COLORS.textLight,
-    maxWidth: 580,
-  },
+  philosophySection: { paddingVertical: 100, backgroundColor: C.bg },
+  philosophyText: { fontSize: 28, fontWeight: '300', lineHeight: 42, color: C.text, letterSpacing: -0.3, marginBottom: 24 },
+  philosophyTextLarge: { fontSize: 36, lineHeight: 52 },
+  philosophyBody: { fontSize: 16, fontWeight: '400', lineHeight: 28, color: C.textLight, maxWidth: 580 },
 
-  /* ── Offerings ── */
-  offeringsGrid: {
-    marginTop: 40,
-  },
-  offeringsGridWide: {
-    flexDirection: 'row',
-  },
-  offering: {
-    flex: 1,
-    paddingVertical: 24,
-  },
-  offeringNumber: {
-    fontSize: 12,
-    fontWeight: '400',
-    letterSpacing: 2,
-    color: COLORS.accent,
-    marginBottom: 16,
-  },
-  offeringTitle: {
-    fontSize: 24,
-    fontWeight: '300',
-    color: COLORS.white,
-    marginBottom: 12,
-    letterSpacing: 0.5,
-  },
-  offeringDesc: {
-    fontSize: 14,
-    fontWeight: '400',
-    lineHeight: 24,
-    color: '#94A3AA',
-    marginBottom: 16,
-  },
-  offeringPrice: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: COLORS.accent,
-    letterSpacing: 1,
-  },
-  offeringDivider: {
-    height: 1,
-    backgroundColor: '#2D4A55',
-    marginVertical: 8,
-  },
-  offeringDividerWide: {
-    width: 1,
-    height: 'auto',
-    marginHorizontal: 32,
-    marginVertical: 0,
-  },
+  offeringsGrid: { marginTop: 40 },
+  offeringsGridWide: { flexDirection: 'row' },
+  offering: { flex: 1, paddingVertical: 24 },
+  offeringHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
+  offeringNumber: { fontSize: 12, fontWeight: '400', letterSpacing: 2, color: C.accent },
+  offeringTitle: { fontSize: 24, fontWeight: '300', color: C.white, marginBottom: 12, letterSpacing: 0.5 },
+  offeringDesc: { fontSize: 14, fontWeight: '400', lineHeight: 24, color: '#94A3AA', marginBottom: 16 },
+  offeringPrice: { fontSize: 14, fontWeight: '500', color: C.accent, letterSpacing: 1 },
+  offeringDivider: { height: 1, backgroundColor: '#2D4A55', marginVertical: 8 },
+  offeringDividerWide: { width: 1, height: 'auto', marginHorizontal: 32, marginVertical: 0 },
 
-  /* ── Locations ── */
   locationsGrid: {},
-  locationsGridWide: {
-    flexDirection: 'row',
-    gap: 48,
-  },
-  locationItem: {
-    flex: 1,
-    paddingVertical: 24,
-  },
-  locationItemBorder: {
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-  },
-  locationName: {
-    fontSize: 22,
-    fontWeight: '400',
-    color: COLORS.text,
-    marginBottom: 2,
-  },
-  locationRegion: {
-    fontSize: 13,
-    fontWeight: '500',
-    letterSpacing: 2,
-    color: COLORS.accent,
-    textTransform: 'uppercase',
-    marginBottom: 8,
-  },
-  locationSeason: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: COLORS.textLight,
-    marginBottom: 10,
-  },
-  locationDetail: {
-    fontSize: 14,
-    fontWeight: '400',
-    lineHeight: 23,
-    color: COLORS.textMuted,
-  },
+  locationsGridWide: { flexDirection: 'row', gap: 32 },
+  locationItem: { flex: 1, paddingVertical: 24 },
+  locationIconRow: { marginBottom: 16 },
+  locationIconCircle: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.white, justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 1 },
+  locationName: { fontSize: 22, fontWeight: '400', color: C.text, marginBottom: 2 },
+  locationRegion: { fontSize: 13, fontWeight: '500', letterSpacing: 2, color: C.accent, textTransform: 'uppercase', marginBottom: 8 },
+  locationSeason: { fontSize: 14, fontWeight: '400', color: C.textLight, marginBottom: 10 },
+  locationDetail: { fontSize: 14, fontWeight: '400', lineHeight: 23, color: C.textMuted },
 
-  /* ── Values ── */
-  valuesGrid: {
-    marginTop: 20,
-  },
-  valuesGridWide: {
-    flexDirection: 'row',
-    gap: 48,
-  },
-  valueItem: {
-    flex: 1,
-    paddingVertical: 20,
-  },
-  valueTitle: {
-    fontSize: 18,
-    fontWeight: '400',
-    color: COLORS.text,
-    marginBottom: 10,
-    letterSpacing: 0.5,
-  },
-  valueBody: {
-    fontSize: 14,
-    fontWeight: '400',
-    lineHeight: 24,
-    color: COLORS.textLight,
-  },
+  valuesGrid: { marginTop: 20 },
+  valuesGridWide: { flexDirection: 'row', gap: 48 },
+  valueItem: { flex: 1, paddingVertical: 20 },
+  valueIconCircle: { width: 48, height: 48, borderRadius: 24, backgroundColor: C.cream, justifyContent: 'center', alignItems: 'center', marginBottom: 16 },
+  valueTitle: { fontSize: 18, fontWeight: '400', color: C.text, marginBottom: 10, letterSpacing: 0.5 },
+  valueBody: { fontSize: 14, fontWeight: '400', lineHeight: 24, color: C.textLight },
 
-  /* ── CTA ── */
-  ctaSection: {
-    paddingVertical: 120,
-    alignItems: 'center',
-    backgroundColor: COLORS.bg,
-  },
-  ctaHeadline: {
-    fontSize: 40,
-    fontWeight: '200',
-    color: COLORS.text,
-    textAlign: 'center',
-    letterSpacing: -0.5,
-    marginBottom: 16,
-  },
-  ctaHeadlineLarge: {
-    fontSize: 56,
-  },
-  ctaSub: {
-    fontSize: 16,
-    fontWeight: '400',
-    lineHeight: 28,
-    color: COLORS.textLight,
-    textAlign: 'center',
-    marginBottom: 40,
-  },
-  ctaButton: {
-    alignSelf: 'center',
-    backgroundColor: COLORS.dark,
-    paddingHorizontal: 48,
-    paddingVertical: 16,
-    borderRadius: 0,
-  },
-  ctaButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
-    letterSpacing: 4,
-    color: COLORS.white,
-    textTransform: 'uppercase',
-  },
+  ctaSection: { paddingVertical: 120, alignItems: 'center', backgroundColor: C.bg },
+  ctaHeadline: { fontSize: 40, fontWeight: '200', color: C.text, textAlign: 'center', letterSpacing: -0.5, marginBottom: 16 },
+  ctaHeadlineLarge: { fontSize: 56 },
+  ctaSub: { fontSize: 16, fontWeight: '400', lineHeight: 28, color: C.textLight, textAlign: 'center', marginBottom: 40 },
+  ctaButton: { alignSelf: 'center', backgroundColor: C.dark, paddingHorizontal: 48, paddingVertical: 16 },
+  ctaButtonText: { fontSize: 12, fontWeight: '500', letterSpacing: 4, color: C.white, textTransform: 'uppercase' },
 
-  /* ── Footer ── */
-  footer: {
-    alignItems: 'center',
-    paddingVertical: 60,
-    paddingHorizontal: 32,
-    backgroundColor: COLORS.bg,
-  },
-  footerBrand: {
-    fontSize: 20,
-    fontWeight: '200',
-    letterSpacing: 12,
-    color: COLORS.textMuted,
-    marginBottom: 6,
-  },
-  footerTagline: {
-    fontSize: 11,
-    fontWeight: '400',
-    letterSpacing: 3,
-    color: COLORS.textMuted,
-    textTransform: 'uppercase',
-    marginBottom: 20,
-  },
-  footerDivider: {
-    width: 24,
-    height: 1,
-    backgroundColor: COLORS.border,
-    marginBottom: 20,
-  },
-  footerCopy: {
-    fontSize: 11,
-    letterSpacing: 2,
-    color: COLORS.textMuted,
-    textTransform: 'uppercase',
-  },
+  footer: { alignItems: 'center', paddingVertical: 60, paddingHorizontal: 32, backgroundColor: C.bg },
+  footerBrand: { fontSize: 20, fontWeight: '200', letterSpacing: 12, color: C.textMuted, marginBottom: 6, paddingLeft: 12 },
+  footerTagline: { fontSize: 11, fontWeight: '400', letterSpacing: 3, color: C.textMuted, textTransform: 'uppercase', marginBottom: 20 },
+  footerDivider: { width: 24, height: 1, backgroundColor: C.border, marginBottom: 20 },
+  footerCopy: { fontSize: 11, letterSpacing: 2, color: C.textMuted, textTransform: 'uppercase' },
 });

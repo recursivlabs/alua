@@ -20,7 +20,7 @@ export default function ExperiencesScreen() {
         <Text style={s.eyebrow}>EXPERIENCES</Text>
         <Text style={s.headline}>One day, one breath,{'\n'}one wave</Text>
         <Text style={s.body}>
-          A single day woven together — breathwork, surf, and a shared meal.
+          A single day woven together. Breathwork, surf, and a shared meal.
           The perfect introduction to the Alua practice.
         </Text>
       </View>
@@ -28,9 +28,9 @@ export default function ExperiencesScreen() {
       {/* Locations */}
       <View style={s.section}>
         {[
-          { title: 'Breathe & Surf — Weligama', location: 'Sri Lanka', price: '$95' },
-          { title: 'Breathe & Surf — Selong Belanak', location: 'Lombok, Indonesia', price: '$120' },
-          { title: 'Breathe & Surf — Nosara', location: 'Costa Rica', price: '$165' },
+          { title: 'Breathe & Surf, Weligama', location: 'Sri Lanka', price: '$95' },
+          { title: 'Breathe & Surf, Selong Belanak', location: 'Lombok, Indonesia', price: '$120' },
+          { title: 'Breathe & Surf, Nosara', location: 'Costa Rica', price: '$165' },
         ].map((e, i) => (
           <View key={i} style={[s.expItem, i > 0 && { borderTopWidth: 1, borderTopColor: C.border }]}>
             <Text style={s.expTitle}>{e.title}</Text>
@@ -48,7 +48,7 @@ export default function ExperiencesScreen() {
         <View style={{ marginTop: 20 }}>
           {EXPERIENCE_INCLUDED.map((item, i) => (
             <View key={i} style={s.featureRow}>
-              <Text style={s.featureDash}>—</Text>
+              <Text style={s.featureDash}>✓</Text>
               <Text style={s.featureText}>{item}</Text>
             </View>
           ))}

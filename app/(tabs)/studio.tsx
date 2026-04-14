@@ -20,7 +20,7 @@ export default function StudioScreen() {
         <Text style={s.headline}>Your practice,{'\n'}anywhere</Text>
         <Text style={s.body}>
           Live breathwork sessions, guided practices, and integration support.
-          Continue your journey between retreats — or start one from home.
+          Continue your journey between retreats, or start one from home.
         </Text>
       </View>
 
@@ -34,7 +34,7 @@ export default function StudioScreen() {
           </View>
           <View style={s.priceDivider} />
           <View style={s.priceOption}>
-            <Text style={[s.priceLabel, { color: C.accent }]}>Annual — Save 32%</Text>
+            <Text style={[s.priceLabel, { color: C.accent }]}>Annual · Save 32%</Text>
             <Text style={s.priceAmount}>$179</Text>
             <Text style={s.pricePer}>/ year</Text>
           </View>
@@ -55,7 +55,7 @@ export default function StudioScreen() {
             'Integration support between retreats',
           ].map((item, i) => (
             <View key={i} style={s.featureRow}>
-              <Text style={s.featureDash}>—</Text>
+              <Text style={s.featureDash}>✓</Text>
               <Text style={s.featureText}>{item}</Text>
             </View>
           ))}

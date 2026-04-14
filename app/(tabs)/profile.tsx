@@ -41,7 +41,7 @@ export default function ProfileScreen() {
 
       <View style={s.section}>
         <Text style={[s.body, { marginBottom: 20 }]}>
-          Guest profile management — dietary needs, medical info, emergency contacts, and booking history — will be available here once bookings open.
+          Guest profile management, dietary needs, medical info, emergency contacts, and booking history will be available here once bookings open.
         </Text>
       </View>
 
