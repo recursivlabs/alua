@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useRecursiv } from '@/contexts/RecursivContext';
 import { callAI } from '@/lib/ai';
 import { AGENT_ID } from '@/lib/recursiv';
@@ -7,6 +7,7 @@ export interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
   content: string;
+  isStreaming?: boolean;
   timestamp: Date;
 }
 
@@ -17,38 +18,60 @@ export function useAiChat() {
   const [conversationId, setConversationId] = useState<string | null>(null);
 
   const sendMessage = useCallback(async (text: string) => {
+    if (isStreaming) return;
+
     const userMsg: ChatMessage = {
-      id: Date.now().toString(),
+      id: 'user-' + Date.now(),
       role: 'user',
       content: text,
       timestamp: new Date(),
     };
-    setMessages((prev) => [...prev, userMsg]);
+
+    const assistantId = 'assistant-' + Date.now();
+
+    // Add user message + streaming placeholder immediately
+    setMessages((prev) => [
+      ...prev,
+      userMsg,
+      {
+        id: assistantId,
+        role: 'assistant',
+        content: '',
+        isStreaming: true,
+        timestamp: new Date(),
+      },
+    ]);
+
     setIsStreaming(true);
 
     try {
+      console.log('[chat] Sending to agent', AGENT_ID, 'conversation', conversationId);
       const result = await callAI(sdk, AGENT_ID, text, conversationId || undefined);
-      setConversationId(result.conversationId);
+      if (result.conversationId) {
+        setConversationId(result.conversationId);
+      }
 
-      const assistantMsg: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: result.content,
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, assistantMsg]);
+      // Replace streaming placeholder with actual response
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === assistantId
+            ? { ...m, isStreaming: false, content: result.content }
+            : m
+        )
+      );
     } catch (err: any) {
-      const errorMsg: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: 'Sorry, I couldn\'t process that. Please try again or contact us directly.',
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, errorMsg]);
+      console.error('[chat] Error:', err.message, err);
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === assistantId
+            ? { ...m, isStreaming: false, content: `Something went wrong: ${err.message}` }
+            : m
+        )
+      );
     } finally {
       setIsStreaming(false);
     }
-  }, [sdk, conversationId]);
+  }, [sdk, isStreaming, conversationId]);
 
   const clearMessages = useCallback(() => {
     setMessages([]);

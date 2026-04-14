@@ -37,7 +37,11 @@ export default function ChatWidget() {
     const isUser = item.role === 'user';
     return (
       <View style={[s.bubble, isUser ? s.userBubble : s.assistantBubble]}>
-        <Text style={[s.bubbleText, { color: isUser ? '#fff' : C.text }]}>{item.content}</Text>
+        {item.isStreaming ? (
+          <Text style={[s.bubbleText, { color: C.textMuted }]}>Thinking...</Text>
+        ) : (
+          <Text style={[s.bubbleText, { color: isUser ? '#fff' : C.text }]}>{item.content}</Text>
+        )}
       </View>
     );
   };
@@ -132,7 +136,7 @@ const s = StyleSheet.create({
   },
   overlayBg: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'transparent',
   },
   panel: {
     width: '100%',
