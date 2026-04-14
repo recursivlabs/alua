@@ -76,9 +76,11 @@ export default function ExperiencesScreen() {
                 <Text style={s.expLocation}>{e.location}</Text>
                 <Text style={s.expPrice}>{e.price}</Text>
               </View>
-              {!isAuthenticated && (
-                <Cta title="Book This Experience" onPress={() => router.push('/auth/sign-up')} style={{ marginTop: 20 }} />
-              )}
+              <Cta
+                title={isAuthenticated ? "Book This Experience" : "Sign Up to Book"}
+                onPress={() => isAuthenticated ? router.push('/(tabs)/experiences') : router.push('/auth/sign-up')}
+                style={{ marginTop: 20 }}
+              />
             </View>
           ))}
         </View>

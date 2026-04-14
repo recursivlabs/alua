@@ -33,7 +33,7 @@ export default function HomeScreen() {
           <Text style={[s.heroTagline, isWide && s.heroTaglineLarge]}>Breathwork & Surf Retreats</Text>
           <Text style={s.heroSub}>Sri Lanka  ·  Indonesia  ·  Costa Rica</Text>
         </View>
-        <Cta title="Explore Retreats" onPress={() => router.push('/(tabs)/retreats')} style={{ marginTop: 48 }} />
+        <Cta title="Explore Retreats" onPress={() => router.push('/(tabs)/retreats')} style={{ marginTop: 48, alignSelf: 'center' }} />
         <Text style={s.scrollHint}>↓</Text>
       </View>
 
@@ -136,11 +136,11 @@ export default function HomeScreen() {
             No surf experience needed. No flexibility required.{'\n'}Just an open heart and willingness to slow down.
           </Text>
           {isAuthenticated ? (
-            <Cta title="Browse Retreats" onPress={() => router.push('/(tabs)/retreats')} />
+            <Cta title="Browse Retreats" onPress={() => router.push('/(tabs)/retreats')} style={{ alignSelf: 'center' }} />
           ) : (
             <View style={{ alignItems: 'center' }}>
-              <Cta title="Create Your Account" onPress={goSignUp} />
-              <Cta title="View Retreats" variant="secondary" onPress={() => router.push('/(tabs)/retreats')} />
+              <Cta title="Create Your Account" onPress={goSignUp} style={{ alignSelf: 'center' }} />
+              <Cta title="View Retreats" variant="secondary" onPress={() => router.push('/(tabs)/retreats')} style={{ alignSelf: 'center' }} />
             </View>
           )}
         </View>

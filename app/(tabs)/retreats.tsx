@@ -90,9 +90,11 @@ export default function RetreatsScreen() {
               </View>
               <Text style={s.retreatLocation}>{r.location}</Text>
               <Text style={s.retreatDates}>{r.dates}</Text>
-              {!isAuthenticated && (
-                <Cta title="Book This Retreat" onPress={() => router.push('/auth/sign-up')} style={{ marginTop: 20 }} />
-              )}
+              <Cta
+                title={isAuthenticated ? "Book This Retreat" : "Sign Up to Book"}
+                onPress={() => isAuthenticated ? router.push('/(tabs)/retreats') : router.push('/auth/sign-up')}
+                style={{ marginTop: 20 }}
+              />
             </View>
           ))}
         </View>

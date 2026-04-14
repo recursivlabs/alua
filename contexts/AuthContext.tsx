@@ -75,8 +75,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setAuthedSdk(sdk);
             setUser(JSON.parse(storedUser));
             setOrgId(storedOrgId);
-          } catch {
-            await clearStorage();
+          } catch (err: any) {
+            // Only clear session on actual auth failures, not network errors
+            const status = err?.status || err?.statusCode;
+            if (status === 401 || status === 403) {
+              console.warn('[Auth] Session expired, clearing');
+              await clearStorage();
+            } else {
+              // Network error, CORS, 500, etc — trust the stored session
+              console.warn('[Auth] Verification failed but keeping session:', err?.message);
+              setAuthedSdk(sdk);
+              setUser(JSON.parse(storedUser));
+              setOrgId(storedOrgId);
+            }
           }
         }
       } catch {
