@@ -2,7 +2,7 @@ import { Tabs } from 'expo-router';
 import { View, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
-import { SideNav, useSidebarState } from '@/components/SideNav';
+import { SideNav, MenuButton, useSidebarState } from '@/components/SideNav';
 
 const C = {
   bg: '#FAF7F4', accent: '#C4956A', textMuted: '#A09890', border: '#E8E0D8',
@@ -19,8 +19,22 @@ export default function TabLayout() {
   if (isWeb) {
     return (
       <View style={{ flex: 1, flexDirection: 'row', backgroundColor: C.bg }}>
-        <SideNav collapsed={sidebar.collapsed} onToggle={sidebar.toggle} />
+        {/* Always-visible sidebar on wide desktop */}
+        {sidebar.showSidebar && !sidebar.isOverlay && (
+          <SideNav isOverlay={false} onClose={sidebar.close} />
+        )}
+
         <View style={{ flex: 1 }}>
+          {/* Menu button on mobile/narrow web */}
+          {!sidebar.showSidebar && (
+            <MenuButton onPress={sidebar.toggle} />
+          )}
+
+          {/* Overlay sidebar */}
+          {sidebar.showSidebar && sidebar.isOverlay && (
+            <SideNav isOverlay={true} onClose={sidebar.close} />
+          )}
+
           <Tabs screenOptions={{ headerShown: false, tabBarStyle: { display: 'none' } }}>
             <Tabs.Screen name="index" />
             <Tabs.Screen name="retreats" />
