@@ -9,6 +9,7 @@ import { dbQuery } from '@/lib/database';
 import { formatPrice } from '@/constants/pricing';
 import type { Booking } from '@/hooks/useBookings';
 import type { GuestProfile } from '@/hooks/useGuestProfile';
+import Cta from '@/components/common/Cta';
 
 const C = {
   bg: '#FAF7F4', text: '#1A1A1A', textLight: '#6B6560', textMuted: '#A09890',
@@ -23,6 +24,7 @@ export default function ProfileScreen() {
 
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [profile, setProfile] = useState<GuestProfile | null>(null);
+  const [editing, setEditing] = useState(false);
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [dietary, setDietary] = useState('');
@@ -58,6 +60,8 @@ export default function ProfileScreen() {
           setEmergencyPhone((p.emergency_contact as any)?.phone || '');
           setSurfLevel((p.experience_level as any)?.surf || 'beginner');
           setBreathworkLevel((p.experience_level as any)?.breathwork || 'beginner');
+        } else {
+          setEditing(true);
         }
       }).catch(console.error);
   }, [ctx?.sdk, user]);
@@ -69,12 +73,8 @@ export default function ProfileScreen() {
         <Text style={[s.body, { textAlign: 'center', marginBottom: 32 }]}>
           Sign in to manage your bookings and guest profile.
         </Text>
-        <TouchableOpacity style={s.ctaButton} onPress={() => router.push('/auth/sign-in')}>
-          <Text style={s.ctaButtonText}>Sign In</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={{ marginTop: 16 }} onPress={() => router.push('/auth/sign-up')}>
-          <Text style={{ fontSize: 15, fontWeight: '500', color: C.dark }}>Create Account</Text>
-        </TouchableOpacity>
+        <Cta title="Sign In" onPress={() => router.push('/auth/sign-in')} style={{ alignSelf: 'center' }} />
+        <Cta title="Create Account" variant="secondary" onPress={() => router.push('/auth/sign-up')} style={{ alignSelf: 'center' }} />
       </View>
     );
   }
@@ -96,13 +96,16 @@ export default function ProfileScreen() {
         await dbQuery(ctx.sdk, `INSERT INTO guest_profiles (user_id, full_name, phone, dietary, medical, emergency_contact, experience_level) VALUES ($1,$2,$3,$4::jsonb,$5::jsonb,$6::jsonb,$7::jsonb)`,
           [user.id, fullName, phone, data.dietary, data.medical, data.emergency_contact, data.experience_level]);
       }
-      Alert.alert('Saved', 'Your profile has been updated.');
+      setProfile({ ...profile, full_name: fullName, phone } as any);
+      setEditing(false);
     } catch (err: any) {
       Alert.alert('Error', err.message);
     } finally {
       setSaving(false);
     }
   };
+
+  const hasProfile = profile && (fullName || phone || dietary || emergencyName);
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: C.bg }} contentContainerStyle={{ paddingTop: insets.top + 40, paddingBottom: insets.bottom + 60 }} showsVerticalScrollIndicator={false}>
@@ -129,49 +132,121 @@ export default function ProfileScreen() {
         </View>
       )}
 
-      {/* Guest Profile Form */}
-      <View style={s.section}>
-        <Text style={s.sectionTitle}>Guest Profile</Text>
-        <Text style={[s.body, { marginBottom: 20 }]}>This info helps us prepare for your arrival.</Text>
+      {/* Profile Card (view mode) */}
+      {hasProfile && !editing && (
+        <View style={s.section}>
+          <View style={s.profileCard}>
+            <View style={s.profileCardHeader}>
+              <Text style={s.sectionTitle}>Guest Profile</Text>
+              <TouchableOpacity onPress={() => setEditing(true)}>
+                <Ionicons name="create-outline" size={20} color={C.accent} />
+              </TouchableOpacity>
+            </View>
 
-        <Text style={s.inputLabel}>Full Name</Text>
-        <TextInput style={s.input} value={fullName} onChangeText={setFullName} placeholder="Your full name" placeholderTextColor={C.textMuted} />
-
-        <Text style={s.inputLabel}>Phone</Text>
-        <TextInput style={s.input} value={phone} onChangeText={setPhone} placeholder="+1 555 123 4567" placeholderTextColor={C.textMuted} keyboardType="phone-pad" />
-
-        <Text style={s.inputLabel}>Dietary Needs</Text>
-        <TextInput style={s.input} value={dietary} onChangeText={setDietary} placeholder="Vegetarian, allergies, etc." placeholderTextColor={C.textMuted} />
-
-        <Text style={s.inputLabel}>Medical Conditions</Text>
-        <TextInput style={s.input} value={medical} onChangeText={setMedical} placeholder="Any conditions or medications" placeholderTextColor={C.textMuted} />
-
-        <Text style={s.inputLabel}>Emergency Contact</Text>
-        <TextInput style={s.input} value={emergencyName} onChangeText={setEmergencyName} placeholder="Contact name" placeholderTextColor={C.textMuted} />
-        <TextInput style={[s.input, { marginTop: 8 }]} value={emergencyPhone} onChangeText={setEmergencyPhone} placeholder="Contact phone" placeholderTextColor={C.textMuted} keyboardType="phone-pad" />
-
-        <Text style={s.inputLabel}>Surf Level</Text>
-        <View style={s.levelRow}>
-          {['beginner', 'intermediate', 'advanced'].map((l) => (
-            <TouchableOpacity key={l} style={[s.levelChip, surfLevel === l && { backgroundColor: C.dark }]} onPress={() => setSurfLevel(l)}>
-              <Text style={[s.levelText, { color: surfLevel === l ? C.white : C.text }]}>{l}</Text>
-            </TouchableOpacity>
-          ))}
+            {fullName && (
+              <View style={s.profileRow}>
+                <Ionicons name="person-outline" size={16} color={C.accent} />
+                <View>
+                  <Text style={s.profileLabel}>Name</Text>
+                  <Text style={s.profileValue}>{fullName}</Text>
+                </View>
+              </View>
+            )}
+            {phone && (
+              <View style={s.profileRow}>
+                <Ionicons name="call-outline" size={16} color={C.accent} />
+                <View>
+                  <Text style={s.profileLabel}>Phone</Text>
+                  <Text style={s.profileValue}>{phone}</Text>
+                </View>
+              </View>
+            )}
+            {dietary && (
+              <View style={s.profileRow}>
+                <Ionicons name="nutrition-outline" size={16} color={C.accent} />
+                <View>
+                  <Text style={s.profileLabel}>Dietary Needs</Text>
+                  <Text style={s.profileValue}>{dietary}</Text>
+                </View>
+              </View>
+            )}
+            {medical && (
+              <View style={s.profileRow}>
+                <Ionicons name="medkit-outline" size={16} color={C.accent} />
+                <View>
+                  <Text style={s.profileLabel}>Medical</Text>
+                  <Text style={s.profileValue}>{medical}</Text>
+                </View>
+              </View>
+            )}
+            {emergencyName && (
+              <View style={s.profileRow}>
+                <Ionicons name="alert-circle-outline" size={16} color={C.accent} />
+                <View>
+                  <Text style={s.profileLabel}>Emergency Contact</Text>
+                  <Text style={s.profileValue}>{emergencyName}{emergencyPhone ? ` · ${emergencyPhone}` : ''}</Text>
+                </View>
+              </View>
+            )}
+            <View style={s.profileRow}>
+              <Ionicons name="water-outline" size={16} color={C.accent} />
+              <View>
+                <Text style={s.profileLabel}>Experience Level</Text>
+                <Text style={s.profileValue}>Surf: {surfLevel} · Breathwork: {breathworkLevel}</Text>
+              </View>
+            </View>
+          </View>
         </View>
+      )}
 
-        <Text style={s.inputLabel}>Breathwork Level</Text>
-        <View style={s.levelRow}>
-          {['beginner', 'intermediate', 'advanced'].map((l) => (
-            <TouchableOpacity key={l} style={[s.levelChip, breathworkLevel === l && { backgroundColor: C.dark }]} onPress={() => setBreathworkLevel(l)}>
-              <Text style={[s.levelText, { color: breathworkLevel === l ? C.white : C.text }]}>{l}</Text>
-            </TouchableOpacity>
-          ))}
+      {/* Profile Form (edit mode) */}
+      {editing && (
+        <View style={s.section}>
+          <Text style={s.sectionTitle}>{hasProfile ? 'Edit Profile' : 'Complete Your Profile'}</Text>
+          <Text style={[s.body, { marginBottom: 20 }]}>This info helps us prepare for your arrival.</Text>
+
+          <Text style={s.inputLabel}>Full Name</Text>
+          <TextInput style={s.input} value={fullName} onChangeText={setFullName} placeholder="Your full name" placeholderTextColor={C.textMuted} />
+
+          <Text style={s.inputLabel}>Phone</Text>
+          <TextInput style={s.input} value={phone} onChangeText={setPhone} placeholder="+1 555 123 4567" placeholderTextColor={C.textMuted} keyboardType="phone-pad" />
+
+          <Text style={s.inputLabel}>Dietary Needs</Text>
+          <TextInput style={s.input} value={dietary} onChangeText={setDietary} placeholder="Vegetarian, allergies, etc." placeholderTextColor={C.textMuted} />
+
+          <Text style={s.inputLabel}>Medical Conditions</Text>
+          <TextInput style={s.input} value={medical} onChangeText={setMedical} placeholder="Any conditions or medications" placeholderTextColor={C.textMuted} />
+
+          <Text style={s.inputLabel}>Emergency Contact Name</Text>
+          <TextInput style={s.input} value={emergencyName} onChangeText={setEmergencyName} placeholder="Contact name" placeholderTextColor={C.textMuted} />
+
+          <Text style={s.inputLabel}>Emergency Contact Phone</Text>
+          <TextInput style={s.input} value={emergencyPhone} onChangeText={setEmergencyPhone} placeholder="Contact phone" placeholderTextColor={C.textMuted} keyboardType="phone-pad" />
+
+          <Text style={s.inputLabel}>Surf Level</Text>
+          <View style={s.levelRow}>
+            {['beginner', 'intermediate', 'advanced'].map((l) => (
+              <TouchableOpacity key={l} style={[s.levelChip, surfLevel === l && { backgroundColor: C.dark }]} onPress={() => setSurfLevel(l)}>
+                <Text style={[s.levelText, { color: surfLevel === l ? C.white : C.text }]}>{l}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <Text style={s.inputLabel}>Breathwork Level</Text>
+          <View style={s.levelRow}>
+            {['beginner', 'intermediate', 'advanced'].map((l) => (
+              <TouchableOpacity key={l} style={[s.levelChip, breathworkLevel === l && { backgroundColor: C.dark }]} onPress={() => setBreathworkLevel(l)}>
+                <Text style={[s.levelText, { color: breathworkLevel === l ? C.white : C.text }]}>{l}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <View style={{ flexDirection: 'row', gap: 12, marginTop: 24 }}>
+            <Cta title={saving ? 'Saving...' : 'Save Profile'} onPress={handleSave} />
+            {hasProfile && <Cta title="Cancel" variant="secondary" onPress={() => setEditing(false)} />}
+          </View>
         </View>
-
-        <TouchableOpacity style={[s.ctaButton, { marginTop: 24 }]} onPress={handleSave} disabled={saving}>
-          <Text style={s.ctaButtonText}>{saving ? 'Saving...' : 'Save Profile'}</Text>
-        </TouchableOpacity>
-      </View>
+      )}
 
       {/* Sign Out */}
       <View style={[s.section, { paddingBottom: 40 }]}>
@@ -199,14 +274,18 @@ const s = StyleSheet.create({
   bookingLocation: { fontSize: 13, letterSpacing: 1, color: C.accent, textTransform: 'uppercase', marginTop: 4 },
   bookingStatus: { fontSize: 12, fontWeight: '500', color: C.textMuted, textTransform: 'uppercase', letterSpacing: 1, marginTop: 4 },
 
+  profileCard: { backgroundColor: C.white, borderWidth: 1, borderColor: C.border, borderRadius: 12, padding: 24 },
+  profileCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+  profileRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 14, marginBottom: 18 },
+  profileLabel: { fontSize: 11, fontWeight: '600', letterSpacing: 1, color: C.textMuted, textTransform: 'uppercase', marginBottom: 2 },
+  profileValue: { fontSize: 15, color: C.text, lineHeight: 22 },
+
   inputLabel: { fontSize: 12, fontWeight: '500', letterSpacing: 1, color: C.textMuted, textTransform: 'uppercase', marginBottom: 6, marginTop: 16 },
-  input: { borderWidth: 1, borderColor: C.border, backgroundColor: C.white, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15, color: C.text },
+  input: { borderWidth: 1, borderColor: C.border, backgroundColor: C.white, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15, color: C.text, borderRadius: 8 },
   levelRow: { flexDirection: 'row', gap: 8, marginTop: 4 },
-  levelChip: { paddingHorizontal: 16, paddingVertical: 8, borderWidth: 1, borderColor: C.border },
+  levelChip: { paddingHorizontal: 16, paddingVertical: 8, borderWidth: 1, borderColor: C.border, borderRadius: 8 },
   levelText: { fontSize: 13, textTransform: 'capitalize', letterSpacing: 0.5 },
 
-  ctaButton: { backgroundColor: C.dark, paddingHorizontal: 36, paddingVertical: 14, alignItems: 'center' },
-  ctaButtonText: { fontSize: 12, fontWeight: '500', letterSpacing: 3, color: C.white, textTransform: 'uppercase' },
-  signOutBtn: { borderWidth: 1, borderColor: C.border, paddingVertical: 14, alignItems: 'center' },
-  signOutText: { fontSize: 12, fontWeight: '500', letterSpacing: 3, color: '#C45A4A', textTransform: 'uppercase' },
+  signOutBtn: { borderWidth: 1, borderColor: C.border, paddingVertical: 14, alignItems: 'center', borderRadius: 8 },
+  signOutText: { fontSize: 14, fontWeight: '500', color: '#C45A4A' },
 });
