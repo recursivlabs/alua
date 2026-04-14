@@ -5,8 +5,8 @@ import { DEFAULT_FAQS, DEFAULT_EMAIL_TEMPLATES, RETREAT_INCLUDED, DEFAULT_DAILY_
 import { RETREAT_PRICING, EXPERIENCE_PRICING, CANCELLATION_POLICY } from '@/constants/pricing';
 
 export async function seedDatabase(sdk: Recursiv): Promise<void> {
-  // Check if already seeded
-  const existing = await dbQuery<{ count: number }>(sdk, `SELECT COUNT(*)::int as count FROM locations`);
+  // Check if already seeded (use FAQs as the marker since they're seeded last)
+  const existing = await dbQuery<{ count: number }>(sdk, `SELECT COUNT(*)::int as count FROM faqs`);
   if ((existing[0]?.count || 0) > 0) {
     console.log('[seed] Database already seeded');
     return;
@@ -20,14 +20,14 @@ export async function seedDatabase(sdk: Recursiv): Promise<void> {
       INSERT INTO locations (id, name, country, description, season_start, season_end, timezone, surf_details, travel_info)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       ON CONFLICT (id) DO NOTHING
-    `, [loc.id, loc.name, loc.country, loc.description, loc.seasonStart, loc.seasonEnd, loc.timezone, JSON.stringify(loc.surfDetails), loc.travelInfo]);
+    `, [loc.id, loc.name, loc.country, loc.description, loc.seasonStart, loc.seasonEnd, loc.timezone, JSON.stringify(loc.surfDetails), JSON.stringify(loc.travelInfo)]);
   }
 
   // Seed sample retreats
   const sampleRetreats = [
     {
       locationId: 'sri-lanka',
-      title: 'Winter Healing — Sri Lanka',
+      title: 'Winter Healing,Sri Lanka',
       description: 'Begin the new year with 6 days of breathwork, surfing, and deep rest on Sri Lanka\'s beautiful south coast. Warm water, clean swells, and the space to slow down and reconnect.',
       startDate: '2027-01-15',
       endDate: '2027-01-20',
@@ -35,7 +35,7 @@ export async function seedDatabase(sdk: Recursiv): Promise<void> {
     },
     {
       locationId: 'lombok',
-      title: 'Presence & Play — Lombok',
+      title: 'Presence & Play,Lombok',
       description: 'Lombok\'s uncrowded beaches and pristine waters create the perfect container for cultivating presence through breathwork and surfing. Small group, big transformation.',
       startDate: '2027-05-10',
       endDate: '2027-05-15',
@@ -43,7 +43,7 @@ export async function seedDatabase(sdk: Recursiv): Promise<void> {
     },
     {
       locationId: 'costa-rica',
-      title: 'Ocean & Breath — Costa Rica',
+      title: 'Ocean & Breath,Costa Rica',
       description: 'Costa Rica\'s Pacific coast during dry season. Offshore winds, overhead swells, and the warmth of a community gathering to breathe, surf, and grow together.',
       startDate: '2027-02-20',
       endDate: '2027-02-25',
@@ -62,19 +62,19 @@ export async function seedDatabase(sdk: Recursiv): Promise<void> {
   const sampleExperiences = [
     {
       locationId: 'sri-lanka',
-      title: 'Breathe & Surf — Weligama',
+      title: 'Breathe & Surf,Weligama',
       description: 'A half-day immersion into Alua\'s core practice. Start with a grounding breathwork session, then take to the warm waters of Weligama Bay for a guided surf lesson. End with a shared meal and reflection.',
       priceCents: EXPERIENCE_PRICING['sri-lanka'],
     },
     {
       locationId: 'lombok',
-      title: 'Breathe & Surf — Selong Belanak',
+      title: 'Breathe & Surf,Selong Belanak',
       description: 'Experience Lombok\'s most beginner-friendly beach with breathwork and surfing woven together. The crescent bay of Selong Belanak offers gentle waves and stunning natural beauty.',
       priceCents: EXPERIENCE_PRICING['lombok'],
     },
     {
       locationId: 'costa-rica',
-      title: 'Breathe & Surf — Nosara',
+      title: 'Breathe & Surf,Nosara',
       description: 'Join us in Nosara for a day of breathwork and surfing on the beautiful Playa Guiones. Consistent waves, warm water, and the vibrant energy of Costa Rica\'s wellness coast.',
       priceCents: EXPERIENCE_PRICING['costa-rica'],
     },

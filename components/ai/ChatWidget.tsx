@@ -1,29 +1,30 @@
 import React, { useState, useRef } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Modal,
-  FlatList,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
+  View, Text, TextInput, TouchableOpacity, Modal, FlatList,
+  KeyboardAvoidingView, Platform, StyleSheet, useWindowDimensions,
 } from 'react-native';
-import { Brand, Colors, Spacing, Radius, Typography } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/useColorScheme';
 import { useAiChat, ChatMessage } from '@/hooks/useAiChat';
 
-const GREETING =
-  "Hi! I'm the Alua Guide. Ask me anything about our retreats, breathwork, or surfing.";
+const C = {
+  bg: '#FFFFFF',
+  text: '#1A1A1A',
+  textLight: '#6B6560',
+  textMuted: '#A09890',
+  accent: '#C4956A',
+  dark: '#1A2F38',
+  cream: '#F0EBE4',
+  border: '#E8E0D8',
+};
+
+const GREETING = "Hi! I'm the Alua Guide. Ask me anything about our retreats, breathwork, or surfing.";
 
 export default function ChatWidget() {
-  const scheme = useColorScheme();
-  const colors = Colors[scheme];
-  const { messages, isStreaming, sendMessage, clearMessages } = useAiChat();
+  const { messages, isStreaming, sendMessage } = useAiChat();
   const [visible, setVisible] = useState(false);
   const [draft, setDraft] = useState('');
   const listRef = useRef<FlatList<ChatMessage>>(null);
+  const { width } = useWindowDimensions();
+  const isWide = width > 768;
 
   const handleSend = () => {
     const text = draft.trim();
@@ -32,65 +33,33 @@ export default function ChatWidget() {
     sendMessage(text);
   };
 
-  const handleClose = () => {
-    setVisible(false);
-  };
-
   const renderMessage = ({ item }: { item: ChatMessage }) => {
     const isUser = item.role === 'user';
     return (
-      <View
-        style={[
-          styles.bubble,
-          isUser
-            ? [styles.userBubble, { backgroundColor: Brand.primary }]
-            : [styles.assistantBubble, { backgroundColor: colors.surfaceRaised }],
-        ]}
-      >
-        <Text
-          style={[
-            styles.bubbleText,
-            { color: isUser ? '#ffffff' : colors.text },
-          ]}
-        >
-          {item.content}
-        </Text>
+      <View style={[s.bubble, isUser ? s.userBubble : s.assistantBubble]}>
+        <Text style={[s.bubbleText, { color: isUser ? '#fff' : C.text }]}>{item.content}</Text>
       </View>
     );
   };
 
   return (
     <>
-      {/* Floating Action Button */}
-      <TouchableOpacity
-        onPress={() => setVisible(true)}
-        activeOpacity={0.8}
-        style={[styles.fab, { backgroundColor: Brand.primary }]}
-      >
-        <Text style={styles.fabIcon}>{'💬'}</Text>
+      <TouchableOpacity onPress={() => setVisible(true)} activeOpacity={0.8} style={s.fab}>
+        <Text style={s.fabIcon}>💬</Text>
       </TouchableOpacity>
 
-      {/* Chat Modal */}
-      <Modal
-        visible={visible}
-        animationType="slide"
-        transparent
-        onRequestClose={handleClose}
-      >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.modalContainer}
-        >
-          <View style={[styles.modal, { backgroundColor: colors.background }]}>
+      <Modal visible={visible} animationType="slide" transparent onRequestClose={() => setVisible(false)}>
+        <View style={s.overlay}>
+          <TouchableOpacity style={s.overlayBg} activeOpacity={1} onPress={() => setVisible(false)} />
+          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={[s.panel, isWide && s.panelWide]}>
             {/* Header */}
-            <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
-              <Text style={[styles.modalTitle, { color: colors.text }]}>
-                Alua Guide
-              </Text>
-              <TouchableOpacity onPress={handleClose}>
-                <Text style={[styles.closeButton, { color: colors.textMuted }]}>
-                  Close
-                </Text>
+            <View style={s.header}>
+              <View>
+                <Text style={s.headerTitle}>Alua Guide</Text>
+                <Text style={s.headerSub}>Ask about retreats, breathwork, or surfing</Text>
+              </View>
+              <TouchableOpacity onPress={() => setVisible(false)} style={s.closeBtn}>
+                <Text style={s.closeBtnText}>✕</Text>
               </TouchableOpacity>
             </View>
 
@@ -100,41 +69,24 @@ export default function ChatWidget() {
               data={messages}
               keyExtractor={(item) => item.id}
               renderItem={renderMessage}
-              contentContainerStyle={styles.messageList}
+              contentContainerStyle={s.messageList}
               ListHeaderComponent={
-                <View
-                  style={[
-                    styles.bubble,
-                    styles.assistantBubble,
-                    { backgroundColor: colors.surfaceRaised },
-                  ]}
-                >
-                  <Text style={[styles.bubbleText, { color: colors.text }]}>
-                    {GREETING}
-                  </Text>
+                <View style={[s.bubble, s.assistantBubble]}>
+                  <Text style={[s.bubbleText, { color: C.text }]}>{GREETING}</Text>
                 </View>
               }
-              onContentSizeChange={() =>
-                listRef.current?.scrollToEnd({ animated: true })
-              }
+              onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: true })}
             />
 
             {/* Input */}
-            <View style={[styles.inputRow, { borderTopColor: colors.border }]}>
+            <View style={s.inputRow}>
               <TextInput
                 value={draft}
                 onChangeText={setDraft}
                 placeholder="Type a message..."
-                placeholderTextColor={colors.textMuted}
+                placeholderTextColor={C.textMuted}
                 multiline
-                style={[
-                  styles.chatInput,
-                  {
-                    backgroundColor: colors.surface,
-                    color: colors.text,
-                    borderColor: colors.border,
-                  },
-                ]}
+                style={s.chatInput}
                 onSubmitEditing={handleSend}
                 returnKeyType="send"
                 blurOnSubmit
@@ -142,116 +94,90 @@ export default function ChatWidget() {
               <TouchableOpacity
                 onPress={handleSend}
                 disabled={!draft.trim() || isStreaming}
-                style={[
-                  styles.sendButton,
-                  {
-                    backgroundColor:
-                      draft.trim() && !isStreaming
-                        ? Brand.primary
-                        : colors.textMuted,
-                  },
-                ]}
-              >
-                <Text style={styles.sendIcon}>{'\u2191'}</Text>
+                style={[s.sendBtn, { opacity: draft.trim() && !isStreaming ? 1 : 0.4 }]}>
+                <Text style={s.sendIcon}>↑</Text>
               </TouchableOpacity>
             </View>
-          </View>
-        </KeyboardAvoidingView>
+          </KeyboardAvoidingView>
+        </View>
       </Modal>
     </>
   );
 }
 
-const styles = StyleSheet.create({
+const s = StyleSheet.create({
   fab: {
     position: 'absolute',
-    bottom: 20,
-    right: 20,
+    bottom: 24,
+    right: 24,
     width: 56,
     height: 56,
-    borderRadius: Radius.full,
+    borderRadius: 28,
+    backgroundColor: C.dark,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 8,
+    zIndex: 100,
   },
-  fabIcon: {
-    fontSize: 24,
-  },
-  modalContainer: {
+  fabIcon: { fontSize: 24 },
+
+  overlay: {
     flex: 1,
     justifyContent: 'flex-end',
+    alignItems: 'flex-end',
   },
-  modal: {
-    height: '80%',
-    borderTopLeftRadius: Radius.xl,
-    borderTopRightRadius: Radius.xl,
-    overflow: 'hidden',
+  overlayBg: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.4)',
   },
-  modalHeader: {
+  panel: {
+    width: '100%',
+    maxHeight: '85%',
+    backgroundColor: C.bg,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  panelWide: {
+    width: 420,
+    maxHeight: '80%',
+    position: 'absolute',
+    bottom: 24,
+    right: 24,
+    borderRadius: 16,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+  },
+
+  header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.md,
+    padding: 20,
     borderBottomWidth: 1,
+    borderBottomColor: C.border,
   },
-  modalTitle: {
-    ...Typography.h3,
-  },
-  closeButton: {
-    ...Typography.bodyMedium,
-  },
-  messageList: {
-    padding: Spacing.md,
-    paddingBottom: Spacing.lg,
-  },
-  bubble: {
-    maxWidth: '80%',
-    padding: Spacing.md,
-    borderRadius: Radius.lg,
-    marginBottom: Spacing.sm,
-  },
-  userBubble: {
-    alignSelf: 'flex-end',
-    borderBottomRightRadius: Radius.sm,
-  },
-  assistantBubble: {
-    alignSelf: 'flex-start',
-    borderBottomLeftRadius: Radius.sm,
-  },
-  bubbleText: {
-    ...Typography.body,
-  },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    padding: Spacing.sm,
-    borderTopWidth: 1,
-    gap: Spacing.sm,
-  },
-  chatInput: {
-    flex: 1,
-    ...Typography.body,
-    borderWidth: 1,
-    borderRadius: Radius.lg,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm + 2,
-    maxHeight: 100,
-  },
-  sendButton: {
-    width: 40,
-    height: 40,
-    borderRadius: Radius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  sendIcon: {
-    color: '#ffffff',
-    fontSize: 20,
-    fontWeight: '700',
-  },
+  headerTitle: { fontSize: 17, fontWeight: '600', color: C.text },
+  headerSub: { fontSize: 13, color: C.textMuted, marginTop: 2 },
+  closeBtn: { width: 32, height: 32, borderRadius: 16, backgroundColor: C.cream, alignItems: 'center', justifyContent: 'center' },
+  closeBtnText: { fontSize: 16, color: C.textLight, fontWeight: '500' },
+
+  messageList: { padding: 16, paddingBottom: 8 },
+  bubble: { maxWidth: '85%', padding: 14, borderRadius: 14, marginBottom: 10 },
+  userBubble: { alignSelf: 'flex-end', backgroundColor: C.dark, borderBottomRightRadius: 4 },
+  assistantBubble: { alignSelf: 'flex-start', backgroundColor: C.cream, borderBottomLeftRadius: 4 },
+  bubbleText: { fontSize: 15, lineHeight: 22 },
+
+  inputRow: { flexDirection: 'row', alignItems: 'flex-end', padding: 12, borderTopWidth: 1, borderTopColor: C.border, gap: 8 },
+  chatInput: { flex: 1, fontSize: 15, borderWidth: 1, borderColor: C.border, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10, maxHeight: 100, color: C.text, backgroundColor: '#FAFAFA' },
+  sendBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: C.dark, alignItems: 'center', justifyContent: 'center' },
+  sendIcon: { color: '#fff', fontSize: 20, fontWeight: '700' },
 });

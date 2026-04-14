@@ -24,7 +24,7 @@ export default function ProfileScreen() {
 
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [profile, setProfile] = useState<GuestProfile | null>(null);
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditing] = useState(true);
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [dietary, setDietary] = useState('');
