@@ -1,95 +1,92 @@
-import { ScrollView, View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Brand, Colors, Spacing, Radius, Typography } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { useExperiences } from '@/hooks/useExperiences';
-import { formatPrice } from '@/constants/pricing';
-import { EXPERIENCE_INCLUDED } from '@/constants/content';
 import { useAuth } from '@/contexts/AuthContext';
+import { EXPERIENCE_INCLUDED } from '@/constants/content';
+
+const C = {
+  bg: '#FAF7F4', text: '#1A1A1A', textLight: '#6B6560', textMuted: '#A09890',
+  accent: '#C4956A', dark: '#1A2F38', cream: '#F0EBE4', border: '#E8E0D8', white: '#FFF',
+};
 
 export default function ExperiencesScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
   const { isAuthenticated } = useAuth();
-  const { experiences, loading } = useExperiences();
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]} contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: insets.bottom + 40 }}>
-      <View style={styles.header}>
-        <Text style={[styles.label, { color: Brand.accent }]}>EXPERIENCES</Text>
-        <Text style={[styles.title, { color: colors.text }]}>One day, one breath, one wave</Text>
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          A single day of breathwork, surfing, and a shared meal. The perfect introduction to the Alua practice.
+    <ScrollView style={{ flex: 1, backgroundColor: C.bg }} contentContainerStyle={{ paddingBottom: insets.bottom + 60 }} showsVerticalScrollIndicator={false}>
+      <View style={[s.hero, { paddingTop: insets.top + 60 }]}>
+        <Text style={s.eyebrow}>EXPERIENCES</Text>
+        <Text style={s.headline}>One day, one breath,{'\n'}one wave</Text>
+        <Text style={s.body}>
+          A single day woven together — breathwork, surf, and a shared meal.
+          The perfect introduction to the Alua practice.
         </Text>
       </View>
 
-      {/* What's included */}
-      <View style={[styles.includedCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        <Text style={[styles.includedTitle, { color: colors.text }]}>Every experience includes</Text>
-        {EXPERIENCE_INCLUDED.map((item) => (
-          <View key={item} style={styles.includedRow}>
-            <Text style={[styles.check, { color: Brand.seafoam }]}>✓</Text>
-            <Text style={[styles.includedText, { color: colors.textSecondary }]}>{item}</Text>
+      {/* Locations */}
+      <View style={s.section}>
+        {[
+          { title: 'Breathe & Surf — Weligama', location: 'Sri Lanka', price: '$95' },
+          { title: 'Breathe & Surf — Selong Belanak', location: 'Lombok, Indonesia', price: '$120' },
+          { title: 'Breathe & Surf — Nosara', location: 'Costa Rica', price: '$165' },
+        ].map((e, i) => (
+          <View key={i} style={[s.expItem, i > 0 && { borderTopWidth: 1, borderTopColor: C.border }]}>
+            <Text style={s.expTitle}>{e.title}</Text>
+            <View style={s.expMeta}>
+              <Text style={s.expLocation}>{e.location}</Text>
+              <Text style={s.expPrice}>{e.price}</Text>
+            </View>
           </View>
         ))}
       </View>
 
-      {loading ? (
-        <ActivityIndicator style={{ marginTop: 40 }} color={Brand.primary} />
-      ) : experiences.length === 0 ? (
-        <View style={styles.emptyState}>
-          <Text style={[styles.emptyTitle, { color: colors.text }]}>Experiences coming soon</Text>
-          <Text style={[styles.emptyBody, { color: colors.textSecondary }]}>
-            Single-day experiences will be available at each of our locations during their season. Sign up to be the first to know.
-          </Text>
-          {!isAuthenticated && (
-            <TouchableOpacity style={styles.emptyBtn} onPress={() => router.push('/auth/sign-up')}>
-              <Text style={styles.emptyBtnText}>Get Notified</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      ) : (
-        <View style={styles.list}>
-          {experiences.map((exp) => (
-            <TouchableOpacity key={exp.id} style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={() => router.push(`/experience/${exp.id}`)}>
-              <Text style={[styles.cardTitle, { color: colors.text }]}>{exp.title}</Text>
-              <Text style={[styles.cardLocation, { color: Brand.seafoam }]}>{exp.location_name}</Text>
-              <Text style={[styles.cardDuration, { color: colors.textSecondary }]}>{exp.duration_hours} hours</Text>
-              <Text style={[styles.cardPrice, { color: colors.text }]}>{formatPrice(exp.price_cents)}</Text>
-            </TouchableOpacity>
+      {/* Included */}
+      <View style={[s.section, { backgroundColor: C.cream }]}>
+        <Text style={s.eyebrow}>EVERY EXPERIENCE INCLUDES</Text>
+        <View style={{ marginTop: 20 }}>
+          {EXPERIENCE_INCLUDED.map((item, i) => (
+            <View key={i} style={s.featureRow}>
+              <Text style={s.featureDash}>—</Text>
+              <Text style={s.featureText}>{item}</Text>
+            </View>
           ))}
         </View>
-      )}
+      </View>
+
+      {/* CTA */}
+      <View style={s.ctaSection}>
+        <Text style={s.ctaSub}>Available at each location during season.</Text>
+        <TouchableOpacity
+          style={s.ctaButton}
+          onPress={() => isAuthenticated ? null : router.push('/auth/sign-up')}>
+          <Text style={s.ctaButtonText}>{isAuthenticated ? 'Coming Soon' : 'Get Notified'}</Text>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: { paddingHorizontal: Spacing.lg, marginBottom: Spacing.lg },
-  label: { ...Typography.label, marginBottom: Spacing.sm },
-  title: { ...Typography.h1, marginBottom: Spacing.sm },
-  subtitle: { ...Typography.body, lineHeight: 26 },
+const s = StyleSheet.create({
+  hero: { paddingHorizontal: 32, paddingBottom: 60 },
+  eyebrow: { fontSize: 11, fontWeight: '600', letterSpacing: 4, color: C.accent, textTransform: 'uppercase', marginBottom: 16 },
+  headline: { fontSize: 36, fontWeight: '200', color: C.text, lineHeight: 46, letterSpacing: -0.5, marginBottom: 20 },
+  body: { fontSize: 16, fontWeight: '400', lineHeight: 28, color: C.textLight, maxWidth: 520 },
 
-  includedCard: { marginHorizontal: Spacing.lg, padding: Spacing.lg, borderRadius: Radius.lg, borderWidth: 1, marginBottom: Spacing.xl },
-  includedTitle: { ...Typography.h3, marginBottom: Spacing.md },
-  includedRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, marginBottom: Spacing.sm },
-  check: { fontSize: 16, fontWeight: '700' },
-  includedText: { ...Typography.body },
+  section: { paddingHorizontal: 32, paddingVertical: 48 },
+  expItem: { paddingVertical: 24 },
+  expTitle: { fontSize: 20, fontWeight: '300', color: C.text, letterSpacing: 0.3, marginBottom: 6 },
+  expMeta: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  expLocation: { fontSize: 13, fontWeight: '500', letterSpacing: 2, color: C.accent, textTransform: 'uppercase' },
+  expPrice: { fontSize: 16, fontWeight: '400', color: C.text, letterSpacing: 1 },
 
-  list: { paddingHorizontal: Spacing.lg, gap: Spacing.md },
-  card: { padding: Spacing.lg, borderRadius: Radius.lg, borderWidth: 1 },
-  cardTitle: { ...Typography.h3, marginBottom: Spacing.xs },
-  cardLocation: { ...Typography.bodyMedium, marginBottom: Spacing.xs },
-  cardDuration: { ...Typography.caption, marginBottom: Spacing.md },
-  cardPrice: { ...Typography.h3 },
+  featureRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, marginBottom: 12 },
+  featureDash: { fontSize: 14, color: C.accent, marginTop: 2 },
+  featureText: { fontSize: 15, lineHeight: 24, color: C.textLight, flex: 1 },
 
-  emptyState: { alignItems: 'center', padding: Spacing.xl, marginTop: 20 },
-  emptyTitle: { ...Typography.h3, marginBottom: Spacing.sm },
-  emptyBody: { ...Typography.body, textAlign: 'center', maxWidth: 400, lineHeight: 24 },
-  emptyBtn: { backgroundColor: Brand.primary, paddingHorizontal: Spacing.xl, paddingVertical: 14, borderRadius: Radius.full, marginTop: Spacing.lg },
-  emptyBtnText: { color: '#fff', ...Typography.bodyMedium },
+  ctaSection: { alignItems: 'center', paddingVertical: 80, paddingHorizontal: 32 },
+  ctaSub: { fontSize: 16, fontWeight: '300', color: C.textLight, marginBottom: 28, textAlign: 'center' },
+  ctaButton: { borderWidth: 1, borderColor: C.text, paddingHorizontal: 36, paddingVertical: 14 },
+  ctaButtonText: { fontSize: 12, fontWeight: '500', letterSpacing: 3, color: C.text, textTransform: 'uppercase' },
 });

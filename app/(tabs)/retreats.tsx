@@ -1,150 +1,94 @@
-import { ScrollView, View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Brand, Colors, Spacing, Radius, Typography } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { useRetreats, type Retreat } from '@/hooks/useRetreats';
-import { useLocations, getSeasonLabel, isInSeason } from '@/hooks/useLocations';
-import { formatPrice } from '@/constants/pricing';
 import { useAuth } from '@/contexts/AuthContext';
+import { RETREAT_INCLUDED } from '@/constants/content';
 
-function RetreatCard({ retreat, onPress }: { retreat: Retreat; onPress: () => void }) {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
-  const spotsLeft = retreat.max_capacity - retreat.current_bookings;
-
-  const startDate = new Date(retreat.start_date);
-  const endDate = new Date(retreat.end_date);
-  const dateStr = `${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
-
-  return (
-    <TouchableOpacity style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={onPress}>
-      <View style={styles.cardHeader}>
-        <Text style={[styles.cardTitle, { color: colors.text }]}>{retreat.title}</Text>
-        {spotsLeft <= 3 && spotsLeft > 0 && (
-          <View style={[styles.badge, { backgroundColor: Brand.coral + '20' }]}>
-            <Text style={[styles.badgeText, { color: Brand.coral }]}>{spotsLeft} spots left</Text>
-          </View>
-        )}
-      </View>
-      <Text style={[styles.cardLocation, { color: Brand.seafoam }]}>{retreat.location_name}</Text>
-      <Text style={[styles.cardDates, { color: colors.textSecondary }]}>{dateStr}</Text>
-      <View style={styles.cardFooter}>
-        <Text style={[styles.cardPrice, { color: colors.text }]}>{formatPrice(retreat.price_cents)}</Text>
-        <Text style={[styles.cardPriceLabel, { color: colors.textMuted }]}>per person</Text>
-      </View>
-    </TouchableOpacity>
-  );
-}
+const C = {
+  bg: '#FAF7F4', text: '#1A1A1A', textLight: '#6B6560', textMuted: '#A09890',
+  accent: '#C4956A', dark: '#1A2F38', cream: '#F0EBE4', border: '#E8E0D8', white: '#FFF',
+};
 
 export default function RetreatsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
   const { isAuthenticated } = useAuth();
-  const { retreats, loading } = useRetreats();
-  const { locations } = useLocations();
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]} contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: insets.bottom + 40 }}>
-      <View style={styles.header}>
-        <Text style={[styles.label, { color: Brand.accent }]}>RETREATS</Text>
-        <Text style={[styles.title, { color: colors.text }]}>5 nights of transformation</Text>
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          Daily breathwork, surfing, nourishing meals, and community in the world's most beautiful coastlines.
+    <ScrollView style={{ flex: 1, backgroundColor: C.bg }} contentContainerStyle={{ paddingBottom: insets.bottom + 60 }} showsVerticalScrollIndicator={false}>
+      <View style={[s.hero, { paddingTop: insets.top + 60 }]}>
+        <Text style={s.eyebrow}>RETREATS</Text>
+        <Text style={s.headline}>5 nights of{'\n'}transformation</Text>
+        <Text style={s.body}>
+          Daily breathwork. Daily surf. Nourishing meals and beachfront accommodations.
+          A small group of 12 in the world's most beautiful coastlines.
         </Text>
       </View>
 
-      {/* Season indicators */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.seasonRow}>
-        {locations.map((loc) => (
-          <View key={loc.id} style={[styles.seasonChip, { backgroundColor: isInSeason(loc.season_start, loc.season_end) ? Brand.seafoam + '20' : colors.surfaceRaised, borderColor: isInSeason(loc.season_start, loc.season_end) ? Brand.seafoam : colors.border }]}>
-            <Text style={[styles.seasonChipName, { color: isInSeason(loc.season_start, loc.season_end) ? Brand.seafoam : colors.textSecondary }]}>{loc.country}</Text>
-            <Text style={[styles.seasonChipDates, { color: colors.textMuted }]}>{getSeasonLabel(loc.season_start, loc.season_end)}</Text>
+      {/* Sample retreats */}
+      <View style={s.section}>
+        {[
+          { title: 'Winter Healing', location: 'Sri Lanka — South Coast', dates: 'Jan 15 – 20, 2027', price: '$1,800' },
+          { title: 'Presence & Play', location: 'Lombok, Indonesia', dates: 'May 10 – 15, 2027', price: '$2,200' },
+          { title: 'Ocean & Breath', location: 'Costa Rica — Pacific', dates: 'Feb 20 – 25, 2027', price: '$2,500' },
+        ].map((r, i) => (
+          <View key={i} style={[s.retreatItem, i > 0 && { borderTopWidth: 1, borderTopColor: C.border }]}>
+            <View style={s.retreatHeader}>
+              <Text style={s.retreatTitle}>{r.title}</Text>
+              <Text style={s.retreatPrice}>{r.price}</Text>
+            </View>
+            <Text style={s.retreatLocation}>{r.location}</Text>
+            <Text style={s.retreatDates}>{r.dates}</Text>
           </View>
         ))}
-      </ScrollView>
+      </View>
 
-      {loading ? (
-        <ActivityIndicator style={{ marginTop: 40 }} color={Brand.primary} />
-      ) : retreats.length === 0 ? (
-        <View style={styles.emptyState}>
-          <Text style={[styles.emptyTitle, { color: colors.text }]}>Retreats coming soon</Text>
-          <Text style={[styles.emptyBody, { color: colors.textSecondary }]}>
-            We're finalizing our upcoming retreat schedule. Join our mailing list to be the first to know when bookings open.
-          </Text>
-          {!isAuthenticated && (
-            <TouchableOpacity style={styles.emptyBtn} onPress={() => router.push('/auth/sign-up')}>
-              <Text style={styles.emptyBtnText}>Get Notified</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      ) : (
-        <View style={styles.list}>
-          {retreats.map((retreat) => (
-            <RetreatCard key={retreat.id} retreat={retreat} onPress={() => router.push(`/retreat/${retreat.id}`)} />
+      {/* Included */}
+      <View style={[s.section, { backgroundColor: C.cream }]}>
+        <Text style={s.eyebrow}>WHAT'S INCLUDED</Text>
+        <View style={{ marginTop: 20 }}>
+          {RETREAT_INCLUDED.map((item, i) => (
+            <View key={i} style={s.includedRow}>
+              <Text style={s.includedCheck}>—</Text>
+              <Text style={s.includedText}>{item}</Text>
+            </View>
           ))}
         </View>
-      )}
+      </View>
 
-      {/* What's included */}
-      <View style={styles.includedSection}>
-        <Text style={[styles.includedTitle, { color: colors.text }]}>What's included</Text>
-        {[
-          'Daily breathwork sessions',
-          'Daily surf sessions with certified instructors',
-          'Board rental and equipment',
-          '2 gourmet, healthy meals per day',
-          'Beachfront accommodations',
-          'Airport transportation',
-          'Movement and recovery classes',
-          'Opening and closing ceremonies',
-          'Small group (max 12 guests)',
-        ].map((item) => (
-          <View key={item} style={styles.includedRow}>
-            <Text style={[styles.includedCheck, { color: Brand.seafoam }]}>✓</Text>
-            <Text style={[styles.includedText, { color: colors.textSecondary }]}>{item}</Text>
-          </View>
-        ))}
+      {/* CTA */}
+      <View style={s.ctaSection}>
+        <Text style={s.ctaText}>No surf experience needed.</Text>
+        <TouchableOpacity
+          style={s.ctaButton}
+          onPress={() => isAuthenticated ? null : router.push('/auth/sign-up')}>
+          <Text style={s.ctaButtonText}>{isAuthenticated ? 'Coming Soon' : 'Join Waitlist'}</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: { paddingHorizontal: Spacing.lg, marginBottom: Spacing.lg },
-  label: { ...Typography.label, marginBottom: Spacing.sm },
-  title: { ...Typography.h1, marginBottom: Spacing.sm },
-  subtitle: { ...Typography.body, lineHeight: 26 },
+const s = StyleSheet.create({
+  hero: { paddingHorizontal: 32, paddingBottom: 60 },
+  eyebrow: { fontSize: 11, fontWeight: '600', letterSpacing: 4, color: C.accent, textTransform: 'uppercase', marginBottom: 16 },
+  headline: { fontSize: 36, fontWeight: '200', color: C.text, lineHeight: 46, letterSpacing: -0.5, marginBottom: 20 },
+  body: { fontSize: 16, fontWeight: '400', lineHeight: 28, color: C.textLight, maxWidth: 520 },
 
-  seasonRow: { paddingHorizontal: Spacing.lg, gap: Spacing.sm, marginBottom: Spacing.lg },
-  seasonChip: { paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm, borderRadius: Radius.full, borderWidth: 1, alignItems: 'center' },
-  seasonChipName: { ...Typography.caption, fontWeight: '600' },
-  seasonChipDates: { ...Typography.small },
+  section: { paddingHorizontal: 32, paddingVertical: 48 },
+  retreatItem: { paddingVertical: 28 },
+  retreatHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
+  retreatTitle: { fontSize: 22, fontWeight: '300', color: C.text, letterSpacing: 0.3 },
+  retreatPrice: { fontSize: 16, fontWeight: '400', color: C.accent, letterSpacing: 1 },
+  retreatLocation: { fontSize: 13, fontWeight: '500', letterSpacing: 2, color: C.accent, textTransform: 'uppercase', marginTop: 6 },
+  retreatDates: { fontSize: 14, color: C.textLight, marginTop: 4 },
 
-  list: { paddingHorizontal: Spacing.lg, gap: Spacing.md },
-  card: { padding: Spacing.lg, borderRadius: Radius.lg, borderWidth: 1 },
-  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
-  cardTitle: { ...Typography.h3, flex: 1, marginBottom: Spacing.xs },
-  badge: { paddingHorizontal: Spacing.sm, paddingVertical: 2, borderRadius: Radius.full, marginLeft: Spacing.sm },
-  badgeText: { ...Typography.small, fontWeight: '600' },
-  cardLocation: { ...Typography.bodyMedium, marginBottom: Spacing.xs },
-  cardDates: { ...Typography.caption, marginBottom: Spacing.md },
-  cardFooter: { flexDirection: 'row', alignItems: 'baseline', gap: Spacing.xs },
-  cardPrice: { ...Typography.h3 },
-  cardPriceLabel: { ...Typography.caption },
+  includedRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, marginBottom: 12 },
+  includedCheck: { fontSize: 14, color: C.accent, marginTop: 2 },
+  includedText: { fontSize: 15, lineHeight: 24, color: C.textLight, flex: 1 },
 
-  emptyState: { alignItems: 'center', padding: Spacing.xl, marginTop: 20 },
-  emptyTitle: { ...Typography.h3, marginBottom: Spacing.sm },
-  emptyBody: { ...Typography.body, textAlign: 'center', maxWidth: 400, lineHeight: 24 },
-  emptyBtn: { backgroundColor: Brand.primary, paddingHorizontal: Spacing.xl, paddingVertical: 14, borderRadius: Radius.full, marginTop: Spacing.lg },
-  emptyBtnText: { color: '#fff', ...Typography.bodyMedium },
-
-  includedSection: { paddingHorizontal: Spacing.lg, marginTop: 48 },
-  includedTitle: { ...Typography.h3, marginBottom: Spacing.md },
-  includedRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, marginBottom: Spacing.sm },
-  includedCheck: { fontSize: 16, fontWeight: '700' },
-  includedText: { ...Typography.body },
+  ctaSection: { alignItems: 'center', paddingVertical: 80, paddingHorizontal: 32 },
+  ctaText: { fontSize: 18, fontWeight: '300', color: C.textLight, marginBottom: 28, textAlign: 'center' },
+  ctaButton: { borderWidth: 1, borderColor: C.text, paddingHorizontal: 36, paddingVertical: 14 },
+  ctaButtonText: { fontSize: 12, fontWeight: '500', letterSpacing: 3, color: C.text, textTransform: 'uppercase' },
 });
