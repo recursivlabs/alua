@@ -113,13 +113,6 @@ export default function RetreatsScreen() {
         </View>
       </View>
 
-      {/* Bottom CTA */}
-      {!isAuthenticated && (
-        <View style={s.bottomCta}>
-          <Text style={s.bottomCtaText}>No surf experience needed. All levels welcome.</Text>
-          <Cta title="Create Account to Book" onPress={() => router.push('/auth/sign-up')} />
-        </View>
-      )}
     </ScrollView>
   );
 }
