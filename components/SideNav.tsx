@@ -21,7 +21,7 @@ const C = {
 
 type NavItem = { name: string; label: string; icon: string; activeIcon: string; authOnly?: boolean; adminOnly?: boolean };
 
-const ADMIN_EMAILS = ['jack@minds.com', 'jack@recursiv.io'];
+const ADMIN_EMAILS = ['jack+alua@minds.com', 'jack@recursiv.io'];
 
 const NAV_ITEMS: NavItem[] = [
   { name: 'index', label: 'Home', icon: 'water-outline', activeIcon: 'water' },

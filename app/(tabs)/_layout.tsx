@@ -8,7 +8,7 @@ const C = {
   bg: '#FAF7F4', accent: '#C4956A', textMuted: '#A09890', border: '#E8E0D8',
 };
 
-const ADMIN_EMAILS = ['jack@minds.com', 'jack@recursiv.io'];
+const ADMIN_EMAILS = ['jack+alua@minds.com', 'jack@recursiv.io'];
 
 export default function TabLayout() {
   const { user } = useAuth();
