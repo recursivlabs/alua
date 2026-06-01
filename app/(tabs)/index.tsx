@@ -45,7 +45,7 @@ export default function HomeScreen() {
             We create containers for healing, growth, and transformation through surf, breathwork, and connection to the ocean.
           </Text>
           <Text style={s.philosophyBody}>
-            Unlike typical retreats focused on aesthetics or performance, Alua weaves breath and surfing together as integrated practices for presence. The ocean becomes the teacher. The breath becomes the anchor. What emerges is yours.
+            Breath and surfing belong together. Both ask the same thing of you: slow down, pay attention, stay with what comes up. The ocean becomes the teacher. The breath becomes the anchor. What emerges is yours.
           </Text>
         </View>
       </View>
@@ -114,7 +114,7 @@ export default function HomeScreen() {
             {[
               { title: 'Community', body: 'The most essential nutrient to our collective healing. Every experience is designed around connection to ourselves, each other, and nature.', icon: 'people-outline' as const },
               { title: 'Sustainability', body: 'Living in deep alignment with nature. Seasonal, slow, and in rhythm. We let growth emerge when conditions are right.', icon: 'earth-outline' as const },
-              { title: 'Service', body: 'At the heart of everything. We create spaces that facilitate genuine growth, not performance. Plan meticulously, hold loosely.', icon: 'heart-outline' as const },
+              { title: 'Service', body: 'At the heart of everything. We design every day for genuine growth, then get out of the way. Plan meticulously, hold loosely.', icon: 'heart-outline' as const },
             ].map((v) => (
               <View key={v.title} style={s.valueItem}>
                 <View style={s.valueIconCircle}>

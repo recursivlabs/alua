@@ -34,7 +34,7 @@ export const DEFAULT_LOCATIONS: Location[] = [
     id: 'lombok',
     name: 'Lombok, Indonesia',
     country: 'Indonesia',
-    description: 'Just east of Bali but worlds apart — Lombok offers uncrowded waves, raw natural beauty, and the intimacy that larger islands have lost. Selong Belanak\'s crescent bay is one of the most beginner-friendly surf beaches in Southeast Asia.',
+    description: 'Just east of Bali but worlds apart. Lombok offers uncrowded waves, raw natural beauty, and the intimacy that larger islands have lost. Selong Belanak\'s crescent bay is one of the most beginner-friendly surf beaches in Southeast Asia.',
     seasonStart: 4,
     seasonEnd: 10,
     timezone: 'Asia/Makassar',
