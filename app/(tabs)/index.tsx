@@ -1,6 +1,6 @@
 import { ScrollView, View, Text, StyleSheet, useWindowDimensions, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useVideoPlayer, VideoView } from 'expo-video';
+import { HeroVideo } from '@/components/HeroVideo';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -24,15 +24,6 @@ export default function HomeScreen() {
   const isWide = width > 900;
   const heroHeight = isWeb ? Math.max(height, 640) : height * 0.85;
 
-  // Muted, looping background video. Poster/fallback is the dark gradient
-  // underneath, so the hero looks intentional before the video paints or if
-  // it can't load.
-  const player = useVideoPlayer(HERO_VIDEO, (p) => {
-    p.loop = true;
-    p.muted = true;
-    p.play();
-  });
-
   const goSignUp = () => router.push('/auth/sign-up');
 
   return (
@@ -49,13 +40,7 @@ export default function HomeScreen() {
           style={StyleSheet.absoluteFill}
           pointerEvents="none"
         />
-        <VideoView
-          player={player}
-          style={StyleSheet.absoluteFill}
-          contentFit="cover"
-          nativeControls={false}
-          pointerEvents="none"
-        />
+        <HeroVideo uri={HERO_VIDEO} />
         {/* Scrim for text contrast */}
         <View pointerEvents="none" style={s.heroScrim} />
         <View style={[s.heroInner, { zIndex: 1 }]}>
