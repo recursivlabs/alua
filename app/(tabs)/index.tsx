@@ -1,4 +1,6 @@
-import { ScrollView, View, Text, StyleSheet, useWindowDimensions, Platform } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, useWindowDimensions, Platform, Animated, Easing } from 'react-native';
+import { useRef, useEffect } from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,17 +22,43 @@ export default function HomeScreen() {
   const isWide = width > 900;
   const heroHeight = isWeb ? Math.max(height * 0.92, 600) : height * 0.85;
 
+  // A slow breathing glow behind the wordmark — expand on the in-breath,
+  // settle on the out-breath. ~9s a cycle, the pace of a calm breath.
+  const breath = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(breath, { toValue: 1, duration: 4500, easing: Easing.inOut(Easing.ease), useNativeDriver: Platform.OS !== 'web' }),
+        Animated.timing(breath, { toValue: 0, duration: 4500, easing: Easing.inOut(Easing.ease), useNativeDriver: Platform.OS !== 'web' }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [breath]);
+  const glowScale = breath.interpolate({ inputRange: [0, 1], outputRange: [0.85, 1.2] });
+  const glowOpacity = breath.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0.7] });
+
   const goSignUp = () => router.push('/auth/sign-up');
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: C.bg }} contentContainerStyle={{ paddingBottom: insets.bottom + 60 }} showsVerticalScrollIndicator={false}>
 
       {/* Hero */}
-      <View style={[s.hero, { minHeight: heroHeight, paddingTop: insets.top }]}>
-        {/* Web-only ambient background: drifting sand/sea gradient + a soft
-            glow that breathes. Classes + keyframes live in app/+html.tsx. */}
-        {isWeb && <View {...({ className: 'alua-hero-bg' } as any)} pointerEvents="none" />}
-        {isWeb && <View {...({ className: 'alua-breath' } as any)} pointerEvents="none" />}
+      <View style={[s.hero, { minHeight: heroHeight, paddingTop: insets.top, overflow: 'hidden' }]}>
+        {/* Ambient background: a soft sand-and-sea gradient with a warm glow
+            that breathes behind the wordmark. */}
+        <LinearGradient
+          colors={['#FAF7F4', '#ECE6DD', '#D8E6E8', '#F3ECE4', '#FAF7F4']}
+          locations={[0, 0.28, 0.55, 0.8, 1]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={StyleSheet.absoluteFill}
+          pointerEvents="none"
+        />
+        <Animated.View
+          pointerEvents="none"
+          style={[s.heroGlow, { opacity: glowOpacity, transform: [{ translateX: -240 }, { scale: glowScale }] }]}
+        />
         <View style={[s.heroInner, { zIndex: 1 }]}>
           <Text style={[s.brandMark, isWide && s.brandMarkLarge]}>ALUA</Text>
           <View style={s.heroLine} />
@@ -163,6 +191,16 @@ export default function HomeScreen() {
 
 const s = StyleSheet.create({
   hero: { justifyContent: 'center', alignItems: 'center', paddingHorizontal: 32, backgroundColor: C.bg },
+  heroGlow: {
+    position: 'absolute',
+    top: '22%',
+    left: '50%',
+    width: 480,
+    height: 480,
+    borderRadius: 240,
+    backgroundColor: 'rgba(196,149,106,0.55)',
+    ...(Platform.OS === 'web' ? ({ filter: 'blur(80px)' } as any) : {}),
+  },
   heroInner: { alignItems: 'center' },
   brandMark: { fontSize: 56, fontWeight: '200', letterSpacing: 24, color: C.text, marginBottom: 20, paddingLeft: 24 },
   brandMarkLarge: { fontSize: 80, letterSpacing: 36, paddingLeft: 36 },

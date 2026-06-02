@@ -91,16 +91,16 @@ export default function FAQScreen() {
 }
 
 const s = StyleSheet.create({
-  hero: { paddingHorizontal: 32, paddingBottom: 32 },
+  hero: { paddingHorizontal: 32, paddingBottom: 32, width: '100%', maxWidth: 760, alignSelf: 'center' },
   eyebrow: { fontSize: 11, fontWeight: '600', letterSpacing: 4, color: C.accent, textTransform: 'uppercase', marginBottom: 16 },
-  headline: { fontSize: 36, fontWeight: '200', color: C.text, lineHeight: 46, letterSpacing: -0.5, marginBottom: 20 },
-  body: { fontSize: 16, fontWeight: '400', lineHeight: 28, color: C.textLight, maxWidth: 520 },
+  headline: { fontSize: 40, fontWeight: '200', color: C.text, lineHeight: 50, letterSpacing: -0.5, marginBottom: 20 },
+  body: { fontSize: 17, fontWeight: '400', lineHeight: 29, color: C.textLight, maxWidth: 560 },
 
   categoryRow: { paddingHorizontal: 32, gap: 8, marginBottom: 24 },
   categoryChip: { paddingHorizontal: 16, paddingVertical: 8, borderWidth: 1, borderColor: C.border },
   categoryText: { fontSize: 12, fontWeight: '500', letterSpacing: 1, textTransform: 'uppercase' },
 
-  faqList: { paddingHorizontal: 32 },
+  faqList: { paddingHorizontal: 32, width: '100%', maxWidth: 760, alignSelf: 'center' },
   faqItem: { borderBottomWidth: 1, borderBottomColor: C.border, paddingVertical: 20 },
   faqHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 },
   faqQuestion: { fontSize: 17, fontWeight: '400', color: C.text, flex: 1, lineHeight: 26 },

@@ -42,9 +42,10 @@ export function useSidebarState() {
     setOpen(false);
   }, []);
 
-  // Closed by default at every width. The hamburger opens it as an overlay,
-  // so the content (and hero) is never pushed over by a persistent sidebar.
-  return { showSidebar: open, isOverlay: true, toggle, close };
+  // Closed by default at every width. The hamburger expands it INLINE — it
+  // takes layout space and pushes content right (a collapsible rail), rather
+  // than floating over the page as an overlay.
+  return { showSidebar: open, isOverlay: false, toggle, close };
 }
 
 export function MenuButton({ onPress }: { onPress: () => void }) {
@@ -89,16 +90,14 @@ export function SideNav({ isOverlay, onClose }: { isOverlay: boolean; onClose: (
           contentContainerStyle={{ paddingTop: 40, paddingBottom: 24, justifyContent: 'space-between', minHeight: '100%' as any }}
           showsVerticalScrollIndicator={false}>
           <View>
-            {/* Brand + close */}
+            {/* Brand + collapse */}
             <View style={s.brandRow}>
               <Pressable onPress={() => { router.push('/(tabs)'); if (isOverlay) onClose(); }}>
                 <Text style={s.brand}>ALUA</Text>
               </Pressable>
-              {isOverlay && (
-                <Pressable onPress={onClose} hitSlop={8} style={({ pressed }) => ({ opacity: pressed ? 0.5 : 0.7, padding: 4 })}>
-                  <Ionicons name="close" size={20} color={C.textMuted} />
-                </Pressable>
-              )}
+              <Pressable onPress={onClose} hitSlop={8} style={({ pressed }) => ({ opacity: pressed ? 0.5 : 0.7, padding: 4 } as any)}>
+                <Ionicons name={isOverlay ? 'close' : 'chevron-back'} size={20} color={C.textMuted} />
+              </Pressable>
             </View>
 
             <View style={s.divider} />

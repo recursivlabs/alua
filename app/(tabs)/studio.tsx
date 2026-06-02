@@ -158,11 +158,11 @@ export default function StudioScreen() {
 }
 
 const s = StyleSheet.create({
-  hero: { paddingHorizontal: 32, paddingBottom: 60 },
+  hero: { paddingHorizontal: 32, paddingBottom: 60, width: '100%', maxWidth: 880, alignSelf: 'center' },
   eyebrow: { fontSize: 11, fontWeight: '600', letterSpacing: 4, color: C.accent, textTransform: 'uppercase', marginBottom: 16 },
-  headline: { fontSize: 36, fontWeight: '200', color: C.text, lineHeight: 46, letterSpacing: -0.5, marginBottom: 20 },
-  body: { fontSize: 16, fontWeight: '400', lineHeight: 28, color: C.textLight, maxWidth: 520 },
-  section: { paddingHorizontal: 32, paddingVertical: 48 },
+  headline: { fontSize: 40, fontWeight: '200', color: C.text, lineHeight: 50, letterSpacing: -0.5, marginBottom: 20 },
+  body: { fontSize: 17, fontWeight: '400', lineHeight: 29, color: C.textLight, maxWidth: 560 },
+  section: { paddingHorizontal: 32, paddingVertical: 48, width: '100%', maxWidth: 880, alignSelf: 'center' },
 
   pricingRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 40, paddingVertical: 20 },
   priceOption: { alignItems: 'center' },
@@ -193,6 +193,6 @@ const s = StyleSheet.create({
   libraryTitle: { fontSize: 18, fontWeight: '300', color: C.text, marginBottom: 4 },
   libraryDesc: { fontSize: 14, lineHeight: 22, color: C.textLight },
 
-  ctaSection: { alignItems: 'center', paddingVertical: 60, paddingHorizontal: 32 },
+  ctaSection: { alignItems: 'center', paddingVertical: 60, paddingHorizontal: 32, width: '100%', maxWidth: 880, alignSelf: 'center' },
   ctaQuote: { fontSize: 20, fontWeight: '300', fontStyle: 'italic', color: C.textLight, textAlign: 'center', lineHeight: 32 },
 });

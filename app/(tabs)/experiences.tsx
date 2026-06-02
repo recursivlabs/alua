@@ -110,11 +110,11 @@ export default function ExperiencesScreen() {
 }
 
 const s = StyleSheet.create({
-  hero: { paddingHorizontal: 32, paddingBottom: 60 },
+  hero: { paddingHorizontal: 32, paddingBottom: 60, width: '100%', maxWidth: 880, alignSelf: 'center' },
   eyebrow: { fontSize: 11, fontWeight: '600', letterSpacing: 4, color: C.accent, textTransform: 'uppercase', marginBottom: 16 },
-  headline: { fontSize: 36, fontWeight: '200', color: C.text, lineHeight: 46, letterSpacing: -0.5, marginBottom: 20 },
-  body: { fontSize: 16, fontWeight: '400', lineHeight: 28, color: C.textLight, maxWidth: 520 },
-  section: { paddingHorizontal: 32, paddingVertical: 48 },
+  headline: { fontSize: 40, fontWeight: '200', color: C.text, lineHeight: 50, letterSpacing: -0.5, marginBottom: 20 },
+  body: { fontSize: 17, fontWeight: '400', lineHeight: 29, color: C.textLight, maxWidth: 560 },
+  section: { paddingHorizontal: 32, paddingVertical: 48, width: '100%', maxWidth: 880, alignSelf: 'center' },
 
   expItem: { paddingVertical: 24 },
   expTitle: { fontSize: 20, fontWeight: '300', color: C.text, letterSpacing: 0.3, marginBottom: 6 },
@@ -126,6 +126,6 @@ const s = StyleSheet.create({
   featureRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, marginBottom: 12 },
   featureText: { fontSize: 15, lineHeight: 24, color: C.textLight, flex: 1 },
 
-  bottomCta: { alignItems: 'center', paddingVertical: 64, paddingHorizontal: 32 },
+  bottomCta: { alignItems: 'center', paddingVertical: 64, paddingHorizontal: 32, width: '100%', maxWidth: 880, alignSelf: 'center' },
   bottomCtaText: { fontSize: 16, fontWeight: '300', color: C.textLight, marginBottom: 8, textAlign: 'center' },
 });

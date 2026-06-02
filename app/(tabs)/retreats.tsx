@@ -118,11 +118,11 @@ export default function RetreatsScreen() {
 }
 
 const s = StyleSheet.create({
-  hero: { paddingHorizontal: 32, paddingBottom: 60 },
+  hero: { paddingHorizontal: 32, paddingBottom: 60, paddingTop: 24, width: '100%', maxWidth: 880, alignSelf: 'center' },
   eyebrow: { fontSize: 11, fontWeight: '600', letterSpacing: 4, color: C.accent, textTransform: 'uppercase', marginBottom: 16 },
-  headline: { fontSize: 36, fontWeight: '200', color: C.text, lineHeight: 46, letterSpacing: -0.5, marginBottom: 20 },
-  body: { fontSize: 16, fontWeight: '400', lineHeight: 28, color: C.textLight, maxWidth: 520 },
-  section: { paddingHorizontal: 32, paddingVertical: 48 },
+  headline: { fontSize: 40, fontWeight: '200', color: C.text, lineHeight: 50, letterSpacing: -0.5, marginBottom: 20 },
+  body: { fontSize: 17, fontWeight: '400', lineHeight: 29, color: C.textLight, maxWidth: 560 },
+  section: { paddingHorizontal: 32, paddingVertical: 48, width: '100%', maxWidth: 880, alignSelf: 'center' },
 
   retreatItem: { paddingVertical: 28 },
   retreatHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },

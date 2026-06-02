@@ -39,33 +39,6 @@ export default function Root({ children }: PropsWithChildren) {
         <style dangerouslySetInnerHTML={{ __html: `
           html, body { background-color: #FAF7F4; }
           #root { display: flex; flex: 1; min-height: 100vh; }
-
-          /* Hero ambience: a slow drifting light gradient (sand + sea) with a
-             soft glow that expands and contracts at a calm breathing pace. */
-          @keyframes aluaDrift {
-            0%   { background-position: 0% 50%; }
-            100% { background-position: 100% 50%; }
-          }
-          @keyframes aluaBreath {
-            0%, 100% { transform: translate(-50%, -50%) scale(0.9);  opacity: 0.38; }
-            50%      { transform: translate(-50%, -50%) scale(1.16); opacity: 0.72; }
-          }
-          .alua-hero-bg {
-            position: absolute; inset: 0;
-            background: linear-gradient(140deg, #FAF7F4 0%, #ECE6DD 28%, #DCE8EA 55%, #F3ECE4 80%, #FAF7F4 100%);
-            background-size: 220% 220%;
-            animation: aluaDrift 26s ease-in-out infinite alternate;
-          }
-          .alua-breath {
-            position: absolute; top: 44%; left: 50%;
-            width: 72vmin; height: 72vmin; border-radius: 50%;
-            background: radial-gradient(circle, rgba(196,149,106,0.30) 0%, rgba(124,160,150,0.12) 45%, rgba(196,149,106,0) 72%);
-            filter: blur(30px); pointer-events: none;
-            animation: aluaBreath 9s ease-in-out infinite;
-          }
-          @media (prefers-reduced-motion: reduce) {
-            .alua-hero-bg, .alua-breath { animation: none; }
-          }
         `}} />
       </head>
       <body>
