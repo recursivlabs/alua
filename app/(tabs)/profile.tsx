@@ -1,4 +1,4 @@
-import { ScrollView, View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useState, useEffect } from 'react';
@@ -61,6 +61,8 @@ export default function ProfileScreen() {
           setEmergencyPhone((p.emergency_contact as any)?.phone || '');
           setSurfLevel((p.experience_level as any)?.surf || 'beginner');
           setBreathworkLevel((p.experience_level as any)?.breathwork || 'beginner');
+          // Returning guest with a filled-in profile lands on the card, not the form.
+          setEditing(!(p.full_name || p.phone));
         } else {
           setEditing(true);
         }
@@ -138,12 +140,23 @@ export default function ProfileScreen() {
       {hasProfile && !editing && (
         <View style={s.section}>
           <View style={s.profileCard}>
-            <View style={s.profileCardHeader}>
-              <Text style={s.sectionTitle}>Guest Profile</Text>
-              <TouchableOpacity onPress={() => setEditing(true)}>
-                <Ionicons name="create-outline" size={20} color={C.accent} />
-              </TouchableOpacity>
+            <View style={s.cardTop}>
+              <View style={s.avatar}>
+                <Text style={s.avatarText}>
+                  {(fullName || user?.name || 'G').trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase()}
+                </Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={s.cardName} numberOfLines={1}>{fullName || user?.name || 'Guest'}</Text>
+                <Text style={s.cardEmail} numberOfLines={1}>{user?.email}</Text>
+              </View>
+              <View style={s.completeBadge}>
+                <Ionicons name="checkmark-circle" size={13} color={C.accent} />
+                <Text style={s.completeBadgeText}>Complete</Text>
+              </View>
             </View>
+
+            <View style={s.cardDivider} />
 
             {fullName && (
               <View style={s.profileRow}>
@@ -197,6 +210,11 @@ export default function ProfileScreen() {
                 <Text style={s.profileValue}>Surf: {surfLevel} · Breathwork: {breathworkLevel}</Text>
               </View>
             </View>
+
+            <TouchableOpacity style={s.editBtn} onPress={() => setEditing(true)} activeOpacity={0.85}>
+              <Ionicons name="create-outline" size={16} color={C.dark} />
+              <Text style={s.editBtnText}>Edit profile</Text>
+            </TouchableOpacity>
           </View>
         </View>
       )}
@@ -262,11 +280,11 @@ export default function ProfileScreen() {
 
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: C.bg, paddingHorizontal: 32 },
-  header: { paddingHorizontal: 32, marginBottom: 32 },
+  header: { paddingHorizontal: 32, marginBottom: 32, width: '100%', maxWidth: 720, alignSelf: 'center' },
   eyebrow: { fontSize: 11, fontWeight: '600', letterSpacing: 4, color: C.accent, textTransform: 'uppercase', marginBottom: 12 },
   headline: { fontSize: 32, fontWeight: '200', color: C.text, letterSpacing: -0.5, marginBottom: 6 },
   body: { fontSize: 16, lineHeight: 28, color: C.textLight },
-  section: { paddingHorizontal: 32, marginBottom: 24 },
+  section: { paddingHorizontal: 32, marginBottom: 24, width: '100%', maxWidth: 720, alignSelf: 'center' },
   sectionTitle: { fontSize: 18, fontWeight: '300', color: C.text, marginBottom: 8, letterSpacing: 0.3 },
 
   bookingItem: { paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: C.border },
@@ -276,11 +294,20 @@ const s = StyleSheet.create({
   bookingLocation: { fontSize: 13, letterSpacing: 1, color: C.accent, textTransform: 'uppercase', marginTop: 4 },
   bookingStatus: { fontSize: 12, fontWeight: '500', color: C.textMuted, textTransform: 'uppercase', letterSpacing: 1, marginTop: 4 },
 
-  profileCard: { backgroundColor: C.white, borderWidth: 1, borderColor: C.border, borderRadius: 12, padding: 24 },
-  profileCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+  profileCard: { backgroundColor: C.white, borderWidth: 1, borderColor: C.border, borderRadius: 16, padding: 28, shadowColor: '#1A2F38', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.06, shadowRadius: 24, elevation: 3 },
+  cardTop: { flexDirection: 'row', alignItems: 'center', gap: 16 },
+  avatar: { width: 56, height: 56, borderRadius: 28, backgroundColor: C.dark, alignItems: 'center', justifyContent: 'center' },
+  avatarText: { fontSize: 20, fontWeight: '400', color: C.white, letterSpacing: 1 },
+  cardName: { fontSize: 20, fontWeight: '400', color: C.text, letterSpacing: 0.2 },
+  cardEmail: { fontSize: 13, color: C.textMuted, marginTop: 2 },
+  completeBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: C.cream, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999 },
+  completeBadgeText: { fontSize: 11, fontWeight: '600', letterSpacing: 0.5, color: C.accent },
+  cardDivider: { height: 1, backgroundColor: C.border, marginVertical: 24 },
   profileRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 14, marginBottom: 18 },
   profileLabel: { fontSize: 11, fontWeight: '600', letterSpacing: 1, color: C.textMuted, textTransform: 'uppercase', marginBottom: 2 },
   profileValue: { fontSize: 15, color: C.text, lineHeight: 22 },
+  editBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 12, paddingVertical: 13, borderRadius: 10, borderWidth: 1, borderColor: C.border, backgroundColor: C.bg, ...(Platform.OS === 'web' ? ({ cursor: 'pointer' } as any) : {}) },
+  editBtnText: { fontSize: 14, fontWeight: '500', color: C.dark, letterSpacing: 0.3 },
 
   inputLabel: { fontSize: 12, fontWeight: '500', letterSpacing: 1, color: C.textMuted, textTransform: 'uppercase', marginBottom: 6, marginTop: 16 },
   input: { borderWidth: 1, borderColor: C.border, backgroundColor: C.white, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15, color: C.text, borderRadius: 8 },

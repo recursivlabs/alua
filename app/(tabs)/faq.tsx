@@ -1,4 +1,4 @@
-import { ScrollView, View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useState, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
@@ -29,6 +29,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
 
 export default function FAQScreen() {
   const insets = useSafeAreaInsets();
+  const isWeb = Platform.OS === 'web';
   const ctx = useRecursivSafe();
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [loading, setLoading] = useState(false);
@@ -64,7 +65,11 @@ export default function FAQScreen() {
       </View>
 
       {/* Category filters */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.categoryRow}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={isWeb ? { width: '100%', maxWidth: 760, alignSelf: 'center' } : undefined}
+        contentContainerStyle={[s.categoryRow, isWeb && { flexGrow: 1, justifyContent: 'center' }]}>
         {CATEGORIES.map((cat) => (
           <TouchableOpacity
             key={cat}

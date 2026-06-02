@@ -5,11 +5,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRecursivSafe } from '@/contexts/RecursivContext';
 import { dbQuery } from '@/lib/database';
-import { STUDIO_PRICING, formatPrice } from '@/constants/pricing';
 import { useState, useEffect } from 'react';
 import type { StudioContent } from '@/hooks/useStudioContent';
 import Cta from '@/components/common/Cta';
-import { showUnderConstruction } from '@/lib/toast';
 
 const C = {
   bg: '#FAF7F4', text: '#1A1A1A', textLight: '#6B6560', textMuted: '#A09890',
@@ -48,32 +46,27 @@ export default function StudioScreen() {
         </Text>
       </View>
 
-      {/* Pricing */}
-      <View style={[s.section, { backgroundColor: C.dark }]}>
-        <View style={s.pricingRow}>
-          <View style={s.priceOption}>
-            <Text style={s.priceLabel}>Monthly</Text>
-            <Text style={s.priceAmount}>{formatPrice(STUDIO_PRICING.monthly)}</Text>
-            <Text style={s.pricePer}>/ month</Text>
-          </View>
-          <View style={s.priceDivider} />
-          <View style={s.priceOption}>
-            <Text style={[s.priceLabel, { color: C.accent }]}>Annual · Save 32%</Text>
-            <Text style={s.priceAmount}>{formatPrice(STUDIO_PRICING.annual)}</Text>
-            <Text style={s.pricePer}>/ year</Text>
-          </View>
-        </View>
-        <Cta
-          title={isAuthenticated ? 'Subscribe' : 'Start Your Practice'}
-          variant="secondary"
-          onPress={() => isAuthenticated ? showUnderConstruction() : router.push('/auth/sign-up')}
-          style={{ alignSelf: 'center', marginTop: 24 }}
-        />
+      {/* Coming soon */}
+      <View style={[s.section, { backgroundColor: C.dark, alignItems: 'center' }]}>
+        <Text style={s.comingTag}>OPENING SOON</Text>
+        <Text style={s.comingTitle}>Coming soon</Text>
+        <Text style={s.comingSub}>
+          Live breathwork sessions and a full library of guided practices are on the way.
+          We will let you know the moment it opens.
+        </Text>
+        {!isAuthenticated && (
+          <Cta
+            title="Create an account"
+            variant="secondary"
+            onPress={() => router.push('/auth/sign-up')}
+            style={{ alignSelf: 'center', marginTop: 24 }}
+          />
+        )}
       </View>
 
       {/* What you get */}
       <View style={s.section}>
-        <Text style={s.eyebrow}>WHAT'S INCLUDED</Text>
+        <Text style={s.eyebrow}>WHAT'S COMING</Text>
         <View style={{ marginTop: 20 }}>
           {[
             '2 live breathwork sessions per month',
@@ -142,7 +135,7 @@ export default function StudioScreen() {
         <View style={s.section}>
           <Text style={s.eyebrow}>PRACTICE LIBRARY</Text>
           <Text style={[s.body, { marginTop: 12 }]}>
-            Guided practices are being added. Subscribe to get notified when the library launches.
+            Guided practices are being added. They will show up here once the studio opens.
           </Text>
         </View>
       )}
@@ -164,6 +157,9 @@ const s = StyleSheet.create({
   body: { fontSize: 17, fontWeight: '400', lineHeight: 29, color: C.textLight, maxWidth: 560 },
   section: { paddingHorizontal: 32, paddingVertical: 48, width: '100%', maxWidth: 880, alignSelf: 'center' },
 
+  comingTag: { fontSize: 11, fontWeight: '600', letterSpacing: 4, color: C.accent, textTransform: 'uppercase', marginBottom: 14 },
+  comingTitle: { fontSize: 44, fontWeight: '200', color: C.white, letterSpacing: -1, marginBottom: 16, textAlign: 'center' },
+  comingSub: { fontSize: 16, fontWeight: '400', lineHeight: 28, color: '#94A3AA', textAlign: 'center', maxWidth: 460 },
   pricingRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 40, paddingVertical: 20 },
   priceOption: { alignItems: 'center' },
   priceLabel: { fontSize: 11, fontWeight: '600', letterSpacing: 3, color: '#94A3AA', textTransform: 'uppercase', marginBottom: 8 },
