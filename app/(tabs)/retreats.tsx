@@ -1,15 +1,14 @@
-import { ScrollView, View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
-import { useRecursivSafe } from '@/contexts/RecursivContext';
-import { dbQuery } from '@/lib/database';
 import { formatPrice } from '@/constants/pricing';
 import { RETREAT_INCLUDED } from '@/constants/content';
-import { useState, useEffect } from 'react';
+import { useDbQuery } from '@/hooks/useDbQuery';
 import type { Retreat } from '@/hooks/useRetreats';
 import Cta from '@/components/common/Cta';
+import { ListSkeleton } from '@/components/common/Skeleton';
 import { showUnderConstruction } from '@/lib/toast';
 
 const C = {
@@ -27,18 +26,10 @@ export default function RetreatsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { isAuthenticated } = useAuth();
-  const ctx = useRecursivSafe();
-  const [retreats, setRetreats] = useState<Retreat[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (!ctx?.sdk) return;
-    setLoading(true);
-    dbQuery<Retreat>(ctx.sdk, `SELECT r.*, l.name as location_name, l.country as location_country FROM retreats r LEFT JOIN locations l ON r.location_id = l.id WHERE r.status = 'published' ORDER BY r.start_date ASC`)
-      .then(setRetreats)
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [ctx?.sdk]);
+  const { data: retreats, loading } = useDbQuery<Retreat>(
+    'retreats:list',
+    `SELECT r.*, l.name as location_name, l.country as location_country FROM retreats r LEFT JOIN locations l ON r.location_id = l.id WHERE r.status = 'published' ORDER BY r.start_date ASC`,
+  );
 
   const hasDbData = retreats.length > 0;
 
@@ -54,7 +45,7 @@ export default function RetreatsScreen() {
       </View>
 
       {loading ? (
-        <ActivityIndicator style={{ marginTop: 40 }} color={C.accent} />
+        <View style={s.section}><ListSkeleton rows={3} /></View>
       ) : (
         <View style={s.section}>
           {(hasDbData ? retreats : []).map((r, i) => {

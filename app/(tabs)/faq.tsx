@@ -1,12 +1,12 @@
-import { ScrollView, View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { useRecursivSafe } from '@/contexts/RecursivContext';
-import { dbQuery } from '@/lib/database';
+import { useDbQuery } from '@/hooks/useDbQuery';
 import { DEFAULT_FAQS } from '@/constants/content';
 import type { FAQ } from '@/hooks/useFaqs';
 import { openChat } from '@/lib/chatBus';
+import { Skeleton } from '@/components/common/Skeleton';
 
 const C = {
   bg: '#FAF7F4', text: '#1A1A1A', textLight: '#6B6560', textMuted: '#A09890',
@@ -31,20 +31,8 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
 export default function FAQScreen() {
   const insets = useSafeAreaInsets();
   const isWeb = Platform.OS === 'web';
-  const ctx = useRecursivSafe();
-  const [faqs, setFaqs] = useState<FAQ[]>([]);
-  const [loading, setLoading] = useState(false);
   const [activeCategory, setActiveCategory] = useState('all');
-
-  useEffect(() => {
-    if (ctx?.sdk) {
-      setLoading(true);
-      dbQuery<FAQ>(ctx.sdk, `SELECT * FROM faqs WHERE published = true ORDER BY sort_order ASC`)
-        .then(setFaqs)
-        .catch(console.error)
-        .finally(() => setLoading(false));
-    }
-  }, [ctx?.sdk]);
+  const { data: faqs, loading } = useDbQuery<FAQ>('faqs:list', `SELECT * FROM faqs WHERE published = true ORDER BY sort_order ASC`);
 
   // Use static FAQs as fallback
   const displayFaqs = faqs.length > 0
@@ -98,7 +86,11 @@ export default function FAQScreen() {
       </ScrollView>
 
       {loading ? (
-        <ActivityIndicator style={{ marginTop: 40 }} color={C.accent} />
+        <View style={s.faqList}>
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <Skeleton key={i} style={{ height: 20, marginVertical: 20, width: i % 2 ? '60%' : '75%' }} />
+          ))}
+        </View>
       ) : (
         <View style={s.faqList}>
           {filtered.map((faq, i) => (

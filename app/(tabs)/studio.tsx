@@ -1,11 +1,9 @@
-import { ScrollView, View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Linking, Alert } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Linking } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
-import { useRecursivSafe } from '@/contexts/RecursivContext';
-import { dbQuery } from '@/lib/database';
-import { useState, useEffect } from 'react';
+import { useDbQuery } from '@/hooks/useDbQuery';
 import type { StudioContent } from '@/hooks/useStudioContent';
 import Cta from '@/components/common/Cta';
 
@@ -18,22 +16,14 @@ export default function StudioScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { isAuthenticated } = useAuth();
-  const ctx = useRecursivSafe();
-  const [recordings, setRecordings] = useState<StudioContent[]>([]);
-  const [liveItems, setLiveItems] = useState<StudioContent[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (!ctx?.sdk) return;
-    setLoading(true);
-    Promise.all([
-      dbQuery<StudioContent>(ctx.sdk, `SELECT * FROM studio_content WHERE published = true AND content_type = 'recorded' ORDER BY sort_order ASC`),
-      dbQuery<StudioContent>(ctx.sdk, `SELECT * FROM studio_content WHERE published = true AND content_type = 'live' ORDER BY scheduled_at ASC`),
-    ])
-      .then(([rec, live]) => { setRecordings(rec); setLiveItems(live); })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [ctx?.sdk]);
+  const { data: recordings, loading } = useDbQuery<StudioContent>(
+    'studio:recorded',
+    `SELECT * FROM studio_content WHERE published = true AND content_type = 'recorded' ORDER BY sort_order ASC`,
+  );
+  const { data: liveItems } = useDbQuery<StudioContent>(
+    'studio:live',
+    `SELECT * FROM studio_content WHERE published = true AND content_type = 'live' ORDER BY scheduled_at ASC`,
+  );
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: C.bg }} contentContainerStyle={{ paddingBottom: insets.bottom + 60 }} showsVerticalScrollIndicator={false}>

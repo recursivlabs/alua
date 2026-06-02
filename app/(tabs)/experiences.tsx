@@ -1,15 +1,14 @@
-import { ScrollView, View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
-import { useRecursivSafe } from '@/contexts/RecursivContext';
-import { dbQuery } from '@/lib/database';
 import { formatPrice } from '@/constants/pricing';
 import { EXPERIENCE_INCLUDED } from '@/constants/content';
-import { useState, useEffect } from 'react';
+import { useDbQuery } from '@/hooks/useDbQuery';
 import type { Experience } from '@/hooks/useExperiences';
 import Cta from '@/components/common/Cta';
+import { ListSkeleton } from '@/components/common/Skeleton';
 import { showUnderConstruction } from '@/lib/toast';
 
 const C = {
@@ -27,18 +26,10 @@ export default function ExperiencesScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { isAuthenticated } = useAuth();
-  const ctx = useRecursivSafe();
-  const [experiences, setExperiences] = useState<Experience[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (!ctx?.sdk) return;
-    setLoading(true);
-    dbQuery<Experience>(ctx.sdk, `SELECT e.*, l.name as location_name FROM experiences e LEFT JOIN locations l ON e.location_id = l.id WHERE e.status = 'published' ORDER BY e.created_at DESC`)
-      .then(setExperiences)
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [ctx?.sdk]);
+  const { data: experiences, loading } = useDbQuery<Experience>(
+    'experiences:list',
+    `SELECT e.*, l.name as location_name FROM experiences e LEFT JOIN locations l ON e.location_id = l.id WHERE e.status = 'published' ORDER BY e.created_at DESC`,
+  );
 
   const hasDbData = experiences.length > 0;
 
@@ -54,7 +45,7 @@ export default function ExperiencesScreen() {
       </View>
 
       {loading ? (
-        <ActivityIndicator style={{ marginTop: 40 }} color={C.accent} />
+        <View style={s.section}><ListSkeleton rows={3} /></View>
       ) : (
         <View style={s.section}>
           {(hasDbData ? experiences : []).map((e, i) => (
