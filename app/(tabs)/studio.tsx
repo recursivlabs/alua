@@ -43,8 +43,8 @@ export default function StudioScreen() {
         <Text style={s.eyebrow}>ONLINE STUDIO</Text>
         <Text style={s.headline}>Your practice,{'\n'}anywhere</Text>
         <Text style={s.body}>
-          Live breathwork sessions, guided practices, and integration support.
-          Continue your journey between retreats, or start one from home.
+          Live breathwork sessions and a library of guided practices.
+          Keep the breath going between retreats, or start from home.
         </Text>
       </View>
 
@@ -150,7 +150,7 @@ export default function StudioScreen() {
       {/* CTA */}
       <View style={s.ctaSection}>
         <Text style={s.ctaQuote}>
-          "Consistency matters more than intensity.{'\n'}Even 10 minutes a day transforms."
+          "Consistency matters more than intensity.{'\n'}Even ten minutes a day adds up."
         </Text>
       </View>
     </ScrollView>

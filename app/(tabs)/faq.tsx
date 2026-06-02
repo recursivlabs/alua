@@ -59,7 +59,7 @@ export default function FAQScreen() {
         <Text style={s.eyebrow}>FAQ</Text>
         <Text style={s.headline}>Common questions</Text>
         <Text style={s.body}>
-          Everything you need to know about Alua retreats, experiences, and the online studio. Can't find your answer? Chat with our AI Guide.
+          Everything worth knowing about the retreats, experiences, and the studio. If your question is not here, the AI Guide can help.
         </Text>
       </View>
 

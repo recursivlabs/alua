@@ -48,8 +48,8 @@ export default function ExperiencesScreen() {
         <Text style={s.eyebrow}>EXPERIENCES</Text>
         <Text style={s.headline}>One day, one breath,{'\n'}one wave</Text>
         <Text style={s.body}>
-          A single day woven together. Breathwork, surf, and a shared meal.
-          The perfect introduction to the Alua practice.
+          A single day. Breathwork, a guided surf, and a shared meal.
+          The easiest way to feel what this is.
         </Text>
       </View>
 

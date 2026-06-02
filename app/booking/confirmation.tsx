@@ -16,7 +16,7 @@ export default function ConfirmationScreen() {
         <Text style={styles.checkmark}>✓</Text>
         <Text style={[styles.title, { color: colors.text }]}>Booking Confirmed</Text>
         <Text style={[styles.body, { color: colors.textSecondary }]}>
-          Thank you for booking with Alua. You'll receive a confirmation email with all the details shortly.
+          You're in. You'll get a confirmation email with all the details shortly.
         </Text>
         <Text style={[styles.body, { color: colors.textSecondary, marginTop: Spacing.md }]}>
           Make sure to complete your guest profile so we can accommodate your dietary needs and prepare for your arrival.

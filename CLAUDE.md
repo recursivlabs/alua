@@ -27,8 +27,10 @@ sentence mid-thought. Read the full profile before writing.
 - Styling: inline `StyleSheet` per screen.
 - Stripe: stubbed in `lib/stripe.ts`, gated behind `EXPO_PUBLIC_STRIPE_CONFIGURED`.
 
-## Open product question
+## Positioning
 
-The founder's persona frames Alua as a men's breathwork and surf brand, but the app and
-original brand brief were built gender-neutral (ideal audience 25-45). Do not narrow copy or
-imagery to men's-only until this is explicitly confirmed.
+Alua is a **men's** breathwork and surf retreat brand (confirmed 2026-06-02). Copy, examples,
+and audience are framed for men, in the founder's voice. Keep the inclusive practicalities
+(all levels, all ages 25-45, no experience needed) but the audience is men. Avoid the bro /
+coaching status words the voice profile bans (warrior, alpha, king, elite, high performance,
+etc.) — the masculinity here is "the courage to live with an open heart," quiet and grounded.

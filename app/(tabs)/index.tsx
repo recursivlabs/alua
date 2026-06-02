@@ -27,14 +27,18 @@ export default function HomeScreen() {
 
       {/* Hero */}
       <View style={[s.hero, { minHeight: heroHeight, paddingTop: insets.top }]}>
-        <View style={s.heroInner}>
+        {/* Web-only ambient background: drifting sand/sea gradient + a soft
+            glow that breathes. Classes + keyframes live in app/+html.tsx. */}
+        {isWeb && <View {...({ className: 'alua-hero-bg' } as any)} pointerEvents="none" />}
+        {isWeb && <View {...({ className: 'alua-breath' } as any)} pointerEvents="none" />}
+        <View style={[s.heroInner, { zIndex: 1 }]}>
           <Text style={[s.brandMark, isWide && s.brandMarkLarge]}>ALUA</Text>
           <View style={s.heroLine} />
-          <Text style={[s.heroTagline, isWide && s.heroTaglineLarge]}>Breathwork & Surf Retreats</Text>
+          <Text style={[s.heroTagline, isWide && s.heroTaglineLarge]}>Men's Breathwork & Surf Retreats</Text>
           <Text style={s.heroSub}>Sri Lanka  ·  Indonesia  ·  Costa Rica</Text>
         </View>
-        <Cta title="Explore Retreats" onPress={() => router.push('/(tabs)/retreats')} style={{ marginTop: 48, alignSelf: 'center' }} />
-        <Text style={s.scrollHint}>↓</Text>
+        <Cta title="Explore Retreats" onPress={() => router.push('/(tabs)/retreats')} style={{ marginTop: 48, alignSelf: 'center', zIndex: 1 }} />
+        <Text style={[s.scrollHint, { zIndex: 1 }]}>↓</Text>
       </View>
 
       {/* Philosophy */}
@@ -42,10 +46,10 @@ export default function HomeScreen() {
         <View style={[s.contentBlock, isWide && s.contentBlockWide]}>
           <Text style={s.eyebrow}>THE PRACTICE</Text>
           <Text style={[s.philosophyText, isWide && s.philosophyTextLarge]}>
-            We create containers for healing, growth, and transformation through surf, breathwork, and connection to the ocean.
+            A week for men to slow down, get in the water, and breathe.
           </Text>
           <Text style={s.philosophyBody}>
-            Breath and surfing belong together. Both ask the same thing of you: slow down, pay attention, stay with what comes up. The ocean becomes the teacher. The breath becomes the anchor. What emerges is yours.
+            Breath and surfing ask the same thing of you. Slow down. Pay attention. Stay with what comes up. The ocean does the teaching, the breath keeps you present, and you get to show up exactly as you are. Nothing to perform out here.
           </Text>
         </View>
       </View>
@@ -56,9 +60,9 @@ export default function HomeScreen() {
           <Text style={[s.eyebrow, { color: C.accent }]}>OFFERINGS</Text>
           <View style={[s.offeringsGrid, isWide && s.offeringsGridWide]}>
             {[
-              { num: '01', title: 'Retreats', desc: '5 nights, 6 days. Daily breathwork and surf. Nourishing meals, beachfront accommodations, and a small community of 12.', price: 'From $1,800', icon: 'compass-outline' as const, cta: 'View Retreats', route: '/(tabs)/retreats' },
-              { num: '02', title: 'Experiences', desc: 'One day. Breathwork session, guided surf lesson, board rental, and a shared meal. The perfect introduction.', price: 'From $95', icon: 'sunny-outline' as const, cta: 'View Experiences', route: '/(tabs)/experiences' },
-              { num: '03', title: 'Online Studio', desc: 'Live breathwork sessions and a full library of guided practices. Continue your journey between retreats.', price: '$22 / month', icon: 'play-circle-outline' as const, cta: 'Learn More', route: '/(tabs)/studio' },
+              { num: '01', title: 'Retreats', desc: '5 nights, 6 days with a small group of men. Daily breathwork and surf, good food, a bed near the water, and the kind of conversations that do not happen at home.', price: 'From $1,800', icon: 'compass-outline' as const, cta: 'View Retreats', route: '/(tabs)/retreats' },
+              { num: '02', title: 'Experiences', desc: 'One day. A breathwork session, a guided surf, and a shared meal. The easiest way to feel what this is.', price: 'From $95', icon: 'sunny-outline' as const, cta: 'View Experiences', route: '/(tabs)/experiences' },
+              { num: '03', title: 'Online Studio', desc: 'Live breathwork sessions and a library of guided practices. Keep the breath going between retreats.', price: '$22 / month', icon: 'play-circle-outline' as const, cta: 'Learn More', route: '/(tabs)/studio' },
             ].map((o, i) => (
               <View key={o.num}>
                 {i > 0 && <View style={[s.offeringDivider, isWide && s.offeringDividerWide]} />}
@@ -84,7 +88,7 @@ export default function HomeScreen() {
           <Text style={[s.eyebrow, { color: C.accent }]}>LOCATIONS</Text>
           <Text style={s.sectionHeadline}>We follow the seasons</Text>
           <Text style={[s.sectionBody, { marginBottom: 48 }]}>
-            Each location opens when the ocean is right. Warm water, clean swells, and the conditions for transformation.
+            Each spot opens when the ocean is right. Warm water, clean waves, and room to breathe.
           </Text>
           <View style={[s.locationsGrid, isWide && s.locationsGridWide]}>
             {[
@@ -112,9 +116,9 @@ export default function HomeScreen() {
           <Text style={[s.eyebrow, { color: C.accent }]}>VALUES</Text>
           <View style={[s.valuesGrid, isWide && s.valuesGridWide]}>
             {[
-              { title: 'Community', body: 'The most essential nutrient to our collective healing. Every experience is designed around connection to ourselves, each other, and nature.', icon: 'people-outline' as const },
-              { title: 'Sustainability', body: 'Living in deep alignment with nature. Seasonal, slow, and in rhythm. We let growth emerge when conditions are right.', icon: 'earth-outline' as const },
-              { title: 'Service', body: 'At the heart of everything. We design every day for genuine growth, then get out of the way. Plan meticulously, hold loosely.', icon: 'heart-outline' as const },
+              { title: 'Community', body: 'Most men are starved for it. Real connection, with yourself, with other men, with the ocean. That sits at the center of everything we do.', icon: 'people-outline' as const },
+              { title: 'Sustainability', body: 'Slow and seasonal. We move with the ocean, not against it, and let things happen at the pace they actually happen.', icon: 'earth-outline' as const },
+              { title: 'Service', body: 'We plan each day with care, then step back. What happens in the water and the breath is yours.', icon: 'heart-outline' as const },
             ].map((v) => (
               <View key={v.title} style={s.valueItem}>
                 <View style={s.valueIconCircle}>
@@ -133,7 +137,7 @@ export default function HomeScreen() {
         <View style={[s.contentBlock, { alignItems: 'center' }]}>
           <Text style={[s.ctaHeadline, isWide && s.ctaHeadlineLarge]}>Come as you are.</Text>
           <Text style={s.ctaSub}>
-            No surf experience needed. No flexibility required.{'\n'}Just an open heart and willingness to slow down.
+            No surf experience needed. No fitness test.{'\n'}Just a willingness to slow down and show up with an open heart.
           </Text>
           {isAuthenticated ? (
             <Cta title="Browse Retreats" onPress={() => router.push('/(tabs)/retreats')} style={{ alignSelf: 'center' }} />
@@ -149,7 +153,7 @@ export default function HomeScreen() {
       {/* Footer */}
       <View style={s.footer}>
         <Text style={s.footerBrand}>ALUA</Text>
-        <Text style={s.footerTagline}>Breathwork & Surf Retreats</Text>
+        <Text style={s.footerTagline}>Men's Breathwork & Surf Retreats</Text>
         <View style={s.footerDivider} />
         <Text style={s.footerCopy}>Sri Lanka  ·  Indonesia  ·  Costa Rica</Text>
       </View>

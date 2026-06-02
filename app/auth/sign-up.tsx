@@ -38,7 +38,7 @@ export default function SignUpScreen() {
       <ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 60, paddingBottom: insets.bottom + 40 }]}>
         <Text style={[styles.logo, { color: colors.text }]}>A L U A</Text>
         <Text style={[styles.title, { color: colors.text }]}>Create your account</Text>
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Join the community</Text>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>A week away starts here.</Text>
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
 

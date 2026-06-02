@@ -1,13 +1,10 @@
 import * as React from 'react';
-import { View, Text, Pressable, Platform, ScrollView, useWindowDimensions, StyleSheet } from 'react-native';
+import { View, Text, Pressable, Platform, ScrollView, StyleSheet } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
 
 const EXPANDED_WIDTH = 220;
-const COLLAPSE_KEY = 'alua:sidebar:collapsed';
-const MOBILE_BREAKPOINT = 768;
-const AUTO_COLLAPSE_WIDTH = 1024;
 
 const C = {
   bg: '#FAF7F4',
@@ -35,18 +32,7 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 export function useSidebarState() {
-  const { width: windowWidth } = useWindowDimensions();
   const [open, setOpen] = React.useState(false);
-
-  const isMobile = windowWidth < MOBILE_BREAKPOINT;
-  const isNarrowDesktop = windowWidth >= MOBILE_BREAKPOINT && windowWidth < AUTO_COLLAPSE_WIDTH;
-
-  // On mobile: hidden by default, opens as overlay
-  // On narrow desktop: hidden by default, opens as overlay
-  // On wide desktop: always visible
-
-  const showSidebar = !isMobile && !isNarrowDesktop ? true : open;
-  const isOverlay = isMobile || isNarrowDesktop;
 
   const toggle = React.useCallback(() => {
     setOpen(prev => !prev);
@@ -56,7 +42,9 @@ export function useSidebarState() {
     setOpen(false);
   }, []);
 
-  return { showSidebar, isOverlay, isMobile, toggle, close };
+  // Closed by default at every width. The hamburger opens it as an overlay,
+  // so the content (and hero) is never pushed over by a persistent sidebar.
+  return { showSidebar: open, isOverlay: true, toggle, close };
 }
 
 export function MenuButton({ onPress }: { onPress: () => void }) {

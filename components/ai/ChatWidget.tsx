@@ -17,7 +17,7 @@ const C = {
   border: '#E8E0D8',
 };
 
-const GREETING = "Hi! I'm the Alua Guide. Ask me anything about our retreats, breathwork, or surfing.";
+const GREETING = "Hey. I'm the Alua Guide. Ask me anything about the retreats, breathwork, or surf.";
 
 const markdownStyles = {
   body: { fontSize: 15, lineHeight: 22, color: C.text },

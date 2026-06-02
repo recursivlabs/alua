@@ -46,10 +46,10 @@ export default function RetreatsScreen() {
     <ScrollView style={{ flex: 1, backgroundColor: C.bg }} contentContainerStyle={{ paddingBottom: insets.bottom + 60 }} showsVerticalScrollIndicator={false}>
       <View style={[s.hero, { paddingTop: insets.top + 60 }]}>
         <Text style={s.eyebrow}>RETREATS</Text>
-        <Text style={s.headline}>5 nights of{'\n'}transformation</Text>
+        <Text style={s.headline}>5 nights to{'\n'}slow down</Text>
         <Text style={s.body}>
-          Daily breathwork. Daily surf. Nourishing meals and beachfront accommodations.
-          A small group of 12 in the world's most beautiful coastlines.
+          Daily breathwork. Daily surf. Good food and a bed near the water.
+          A small group of twelve men on some of the best coastline in the world.
         </Text>
       </View>
 
