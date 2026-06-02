@@ -42,10 +42,9 @@ export function useSidebarState() {
     setOpen(false);
   }, []);
 
-  // Closed by default at every width. The hamburger expands it INLINE — it
-  // takes layout space and pushes content right (a collapsible rail), rather
-  // than floating over the page as an overlay.
-  return { showSidebar: open, isOverlay: false, toggle, close };
+  // Closed by default at every width. The hamburger opens it as an overlay
+  // that floats over the content (with a backdrop) — the page never shifts.
+  return { showSidebar: open, isOverlay: true, toggle, close };
 }
 
 export function MenuButton({ onPress }: { onPress: () => void }) {

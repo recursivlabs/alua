@@ -20,7 +20,7 @@ export default function HomeScreen() {
   const { width, height } = useWindowDimensions();
   const isWeb = Platform.OS === 'web';
   const isWide = width > 900;
-  const heroHeight = isWeb ? Math.max(height * 0.92, 600) : height * 0.85;
+  const heroHeight = isWeb ? Math.max(height, 640) : height * 0.85;
 
   // A slow breathing glow behind the wordmark — expand on the in-breath,
   // settle on the out-breath. ~9s a cycle, the pace of a calm breath.
