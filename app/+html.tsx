@@ -9,6 +9,11 @@ export default function Root({ children }: PropsWithChildren) {
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
+        {/* Favicon */}
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="icon" type="image/png" href="/favicon.png" />
+        <link rel="apple-touch-icon" href="/favicon.png" />
+
         {/* Primary */}
         <title>Alua · Men's Breathwork & Surf Retreats</title>
         <meta name="description" content="Breathwork and surf retreats for men. Slow down, get in the water, and meet yourself with an open heart. Sri Lanka · Indonesia · Costa Rica." />

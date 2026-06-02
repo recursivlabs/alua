@@ -490,15 +490,15 @@ export default function AdminScreen() {
 
 const s = StyleSheet.create({
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header: { paddingHorizontal: 32, marginBottom: 16 },
+  header: { paddingHorizontal: 32, marginBottom: 16, width: '100%', maxWidth: 880, alignSelf: 'center' },
   eyebrow: { fontSize: 11, fontWeight: '600', letterSpacing: 4, color: C.accent, textTransform: 'uppercase', marginBottom: 8 },
   headline: { fontSize: 28, fontWeight: '200', color: C.text, letterSpacing: -0.5 },
 
-  tabRow: { paddingHorizontal: 32, gap: 6, marginBottom: 24 },
+  tabRow: { paddingHorizontal: 32, gap: 6, marginBottom: 24, width: '100%', maxWidth: 880, alignSelf: 'center' },
   tabChip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 8, borderWidth: 1, borderColor: C.border },
   tabText: { fontSize: 12, fontWeight: '500', letterSpacing: 0.5 },
 
-  section: { paddingHorizontal: 32, marginBottom: 24 },
+  section: { paddingHorizontal: 32, marginBottom: 24, width: '100%', maxWidth: 880, alignSelf: 'center' },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
   sectionTitle: { fontSize: 18, fontWeight: '300', color: C.text },
 

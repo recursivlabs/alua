@@ -6,6 +6,7 @@ import { useRecursivSafe } from '@/contexts/RecursivContext';
 import { dbQuery } from '@/lib/database';
 import { DEFAULT_FAQS } from '@/constants/content';
 import type { FAQ } from '@/hooks/useFaqs';
+import { openChat } from '@/lib/chatBus';
 
 const C = {
   bg: '#FAF7F4', text: '#1A1A1A', textLight: '#6B6560', textMuted: '#A09890',
@@ -64,6 +65,20 @@ export default function FAQScreen() {
         </Text>
       </View>
 
+      {/* Ask the Guide CTA */}
+      <View style={s.askWrap}>
+        <TouchableOpacity style={s.askCta} onPress={openChat} activeOpacity={0.85}>
+          <View style={s.askIcon}>
+            <Ionicons name="chatbubble-ellipses-outline" size={20} color={C.white} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={s.askTitle}>Ask the Alua Guide</Text>
+            <Text style={s.askSub}>Get an answer to anything, right now.</Text>
+          </View>
+          <Ionicons name="arrow-forward" size={18} color={C.accent} />
+        </TouchableOpacity>
+      </View>
+
       {/* Category filters */}
       <ScrollView
         horizontal
@@ -101,6 +116,11 @@ const s = StyleSheet.create({
   headline: { fontSize: 40, fontWeight: '200', color: C.text, lineHeight: 50, letterSpacing: -0.5, marginBottom: 20 },
   body: { fontSize: 17, fontWeight: '400', lineHeight: 29, color: C.textLight, maxWidth: 560 },
 
+  askWrap: { paddingHorizontal: 32, width: '100%', maxWidth: 760, alignSelf: 'center', marginBottom: 24 },
+  askCta: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: C.dark, borderRadius: 14, paddingVertical: 16, paddingHorizontal: 20, ...(Platform.OS === 'web' ? ({ cursor: 'pointer' } as any) : {}) },
+  askIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: C.accent, alignItems: 'center', justifyContent: 'center' },
+  askTitle: { fontSize: 16, fontWeight: '500', color: C.white, letterSpacing: 0.2 },
+  askSub: { fontSize: 13, color: '#94A3AA', marginTop: 2 },
   categoryRow: { paddingHorizontal: 32, gap: 8, marginBottom: 24 },
   categoryChip: { paddingHorizontal: 16, paddingVertical: 8, borderWidth: 1, borderColor: C.border },
   categoryText: { fontSize: 12, fontWeight: '500', letterSpacing: 1, textTransform: 'uppercase' },

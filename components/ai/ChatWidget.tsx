@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import { useAiChat, ChatMessage } from '@/hooks/useAiChat';
+import { onOpenChat } from '@/lib/chatBus';
 
 const C = {
   bg: '#FFFFFF',
@@ -49,6 +50,9 @@ export default function ChatWidget() {
       setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 100);
     }
   }, [messages]);
+
+  // Let any screen open the chat (e.g. the FAQ "ask the Guide" CTA).
+  useEffect(() => onOpenChat(() => setVisible(true)), []);
 
   const handleSend = () => {
     const text = draft.trim();
