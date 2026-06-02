@@ -1,6 +1,6 @@
-import { ScrollView, View, Text, StyleSheet, useWindowDimensions, Platform } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, useWindowDimensions, Platform, Animated, Easing } from 'react-native';
+import { useRef, useEffect } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
-import { HeroVideo } from '@/components/HeroVideo';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -13,8 +13,6 @@ const C = {
   border: '#E8E0D8', white: '#FFFFFF',
 };
 
-const HERO_VIDEO = 'https://alua.on.recursiv.io/hero.mp4';
-
 export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -24,6 +22,22 @@ export default function HomeScreen() {
   const isWide = width > 900;
   const heroHeight = isWeb ? Math.max(height, 640) : height * 0.85;
 
+  // A slow breathing glow behind the wordmark — expand on the in-breath,
+  // settle on the out-breath. ~9s a cycle, the pace of a calm breath.
+  const breath = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(breath, { toValue: 1, duration: 4500, easing: Easing.inOut(Easing.ease), useNativeDriver: Platform.OS !== 'web' }),
+        Animated.timing(breath, { toValue: 0, duration: 4500, easing: Easing.inOut(Easing.ease), useNativeDriver: Platform.OS !== 'web' }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [breath]);
+  const glowScale = breath.interpolate({ inputRange: [0, 1], outputRange: [0.85, 1.2] });
+  const glowOpacity = breath.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0.7] });
+
   const goSignUp = () => router.push('/auth/sign-up');
 
   return (
@@ -31,18 +45,20 @@ export default function HomeScreen() {
 
       {/* Hero */}
       <View style={[s.hero, { minHeight: heroHeight, paddingTop: insets.top, overflow: 'hidden' }]}>
-        {/* Poster / fallback under the video */}
+        {/* Ambient background: a soft sand-and-sea gradient with a warm glow
+            that breathes behind the wordmark. */}
         <LinearGradient
-          colors={['#16282F', '#1A2F38', '#22414C', '#16282F']}
-          locations={[0, 0.4, 0.75, 1]}
+          colors={['#FAF7F4', '#ECE6DD', '#D8E6E8', '#F3ECE4', '#FAF7F4']}
+          locations={[0, 0.28, 0.55, 0.8, 1]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={StyleSheet.absoluteFill}
           pointerEvents="none"
         />
-        <HeroVideo uri={HERO_VIDEO} />
-        {/* Scrim for text contrast */}
-        <View pointerEvents="none" style={s.heroScrim} />
+        <Animated.View
+          pointerEvents="none"
+          style={[s.heroGlow, { opacity: glowOpacity, transform: [{ translateX: -240 }, { scale: glowScale }] }]}
+        />
         <View style={[s.heroInner, { zIndex: 1 }]}>
           <Text style={[s.brandMark, isWide && s.brandMarkLarge]}>ALUA</Text>
           <View style={s.heroLine} />
@@ -174,16 +190,25 @@ export default function HomeScreen() {
 }
 
 const s = StyleSheet.create({
-  hero: { justifyContent: 'center', alignItems: 'center', paddingHorizontal: 32, backgroundColor: '#16282F' },
-  heroScrim: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(13,22,27,0.42)' },
+  hero: { justifyContent: 'center', alignItems: 'center', paddingHorizontal: 32, backgroundColor: C.bg },
+  heroGlow: {
+    position: 'absolute',
+    top: '22%',
+    left: '50%',
+    width: 480,
+    height: 480,
+    borderRadius: 240,
+    backgroundColor: 'rgba(196,149,106,0.55)',
+    ...(Platform.OS === 'web' ? ({ filter: 'blur(80px)' } as any) : {}),
+  },
   heroInner: { alignItems: 'center' },
-  brandMark: { fontSize: 56, fontWeight: '200', letterSpacing: 24, color: '#FAF7F4', marginBottom: 20, paddingLeft: 24 },
+  brandMark: { fontSize: 56, fontWeight: '200', letterSpacing: 24, color: C.text, marginBottom: 20, paddingLeft: 24 },
   brandMarkLarge: { fontSize: 80, letterSpacing: 36, paddingLeft: 36 },
   heroLine: { width: 40, height: 1, backgroundColor: C.accent, marginBottom: 20 },
-  heroTagline: { fontSize: 15, fontWeight: '400', letterSpacing: 4, color: 'rgba(250,247,244,0.82)', textTransform: 'uppercase', textAlign: 'center', paddingLeft: 4 },
+  heroTagline: { fontSize: 15, fontWeight: '400', letterSpacing: 4, color: C.textLight, textTransform: 'uppercase', textAlign: 'center', paddingLeft: 4 },
   heroTaglineLarge: { fontSize: 17, letterSpacing: 6, paddingLeft: 6 },
-  heroSub: { fontSize: 13, letterSpacing: 3, color: 'rgba(250,247,244,0.6)', textTransform: 'uppercase', marginTop: 12, textAlign: 'center', paddingLeft: 3 },
-  scrollHint: { position: 'absolute', bottom: 32, fontSize: 18, color: 'rgba(250,247,244,0.6)' },
+  heroSub: { fontSize: 13, letterSpacing: 3, color: C.textMuted, textTransform: 'uppercase', marginTop: 12, textAlign: 'center', paddingLeft: 3 },
+  scrollHint: { position: 'absolute', bottom: 32, fontSize: 18, color: C.textMuted },
 
   section: { paddingVertical: 80, paddingHorizontal: 32 },
   contentBlock: { maxWidth: 720, alignSelf: 'center', width: '100%' },
