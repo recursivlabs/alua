@@ -19,6 +19,7 @@ type Tab = 'overview' | 'retreats' | 'experiences' | 'studio' | 'faqs' | 'bookin
 
 export default function AdminScreen() {
   const insets = useSafeAreaInsets();
+  const isWeb = Platform.OS === 'web';
   const { user } = useAuth();
   const ctx = useRecursivSafe();
   const [tab, setTab] = useState<Tab>('overview');
@@ -207,7 +208,11 @@ export default function AdminScreen() {
       </View>
 
       {/* Tab bar */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.tabRow}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={isWeb ? { width: '100%', maxWidth: 880, alignSelf: 'center' } : undefined}
+        contentContainerStyle={[s.tabRow, isWeb && { flexGrow: 1, justifyContent: 'center' }]}>
         {TABS.map((t) => (
           <TouchableOpacity key={t.key} style={[s.tabChip, tab === t.key && { backgroundColor: C.dark }]} onPress={() => { setTab(t.key); resetForm(); }}>
             <Ionicons name={t.icon as any} size={14} color={tab === t.key ? C.white : C.textLight} />
