@@ -2,7 +2,7 @@ import { Tabs } from 'expo-router';
 import { View, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
-import { SideNav, MenuButton, useSidebarState } from '@/components/SideNav';
+import { TopNav } from '@/components/TopNav';
 
 const C = {
   bg: '#FAF7F4', accent: '#C4956A', textMuted: '#A09890', border: '#E8E0D8',
@@ -14,38 +14,21 @@ export default function TabLayout() {
   const { user } = useAuth();
   const isAdmin = ADMIN_EMAILS.includes(user?.email?.toLowerCase() || '');
   const isWeb = Platform.OS === 'web';
-  const sidebar = useSidebarState();
 
   if (isWeb) {
     return (
-      <View style={{ flex: 1, flexDirection: 'row', backgroundColor: C.bg }}>
-        {/* Always-visible sidebar on wide desktop */}
-        {sidebar.showSidebar && !sidebar.isOverlay && (
-          <SideNav isOverlay={false} onClose={sidebar.close} />
-        )}
-
-        <View style={{ flex: 1 }}>
-          {/* Menu button on mobile/narrow web */}
-          {!sidebar.showSidebar && (
-            <MenuButton onPress={sidebar.toggle} />
-          )}
-
-          {/* Overlay sidebar */}
-          {sidebar.showSidebar && sidebar.isOverlay && (
-            <SideNav isOverlay={true} onClose={sidebar.close} />
-          )}
-
-          <Tabs screenOptions={{ headerShown: false, tabBarStyle: { display: 'none' } }}>
-            <Tabs.Screen name="index" />
-            <Tabs.Screen name="retreats" />
-            <Tabs.Screen name="experiences" />
-            <Tabs.Screen name="studio" />
-            <Tabs.Screen name="about" />
-            <Tabs.Screen name="faq" />
-            <Tabs.Screen name="profile" />
-            <Tabs.Screen name="admin" options={{ href: isAdmin ? undefined : null }} />
-          </Tabs>
-        </View>
+      <View style={{ flex: 1, backgroundColor: C.bg }}>
+        <TopNav />
+        <Tabs screenOptions={{ headerShown: false, tabBarStyle: { display: 'none' } }}>
+          <Tabs.Screen name="index" />
+          <Tabs.Screen name="retreats" />
+          <Tabs.Screen name="experiences" />
+          <Tabs.Screen name="studio" />
+          <Tabs.Screen name="about" />
+          <Tabs.Screen name="faq" />
+          <Tabs.Screen name="profile" />
+          <Tabs.Screen name="admin" options={{ href: isAdmin ? undefined : null }} />
+        </Tabs>
       </View>
     );
   }
