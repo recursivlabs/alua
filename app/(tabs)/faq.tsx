@@ -6,6 +6,7 @@ import { useDbQuery } from '@/hooks/useDbQuery';
 import { DEFAULT_FAQS } from '@/constants/content';
 import type { FAQ } from '@/hooks/useFaqs';
 import { openChat } from '@/lib/chatBus';
+import { useAuth } from '@/contexts/AuthContext';
 import { Skeleton } from '@/components/common/Skeleton';
 
 const C = {
@@ -31,6 +32,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
 export default function FAQScreen() {
   const insets = useSafeAreaInsets();
   const isWeb = Platform.OS === 'web';
+  const { isAuthenticated } = useAuth();
   const [activeCategory, setActiveCategory] = useState('all');
   const { data: faqs, loading } = useDbQuery<FAQ>('faqs:list', `SELECT * FROM faqs WHERE published = true ORDER BY sort_order ASC`);
 
@@ -53,19 +55,21 @@ export default function FAQScreen() {
         </Text>
       </View>
 
-      {/* Ask the Guide CTA */}
-      <View style={s.askWrap}>
-        <TouchableOpacity style={s.askCta} onPress={openChat} activeOpacity={0.85}>
-          <View style={s.askIcon}>
-            <Ionicons name="chatbubble-ellipses-outline" size={20} color={C.white} />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={s.askTitle}>Ask the Alua Guide</Text>
-            <Text style={s.askSub}>Get an answer to anything, right now.</Text>
-          </View>
-          <Ionicons name="arrow-forward" size={18} color={C.accent} />
-        </TouchableOpacity>
-      </View>
+      {/* Ask the Guide CTA — chat needs auth, so only for signed-in users */}
+      {isAuthenticated && (
+        <View style={s.askWrap}>
+          <TouchableOpacity style={s.askCta} onPress={openChat} activeOpacity={0.85}>
+            <View style={s.askIcon}>
+              <Ionicons name="chatbubble-ellipses-outline" size={20} color={C.white} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={s.askTitle}>Ask the Alua Guide</Text>
+              <Text style={s.askSub}>Get an answer to anything, right now.</Text>
+            </View>
+            <Ionicons name="arrow-forward" size={18} color={C.accent} />
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* Category filters */}
       <ScrollView
