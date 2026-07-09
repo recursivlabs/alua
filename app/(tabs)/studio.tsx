@@ -2,9 +2,9 @@ import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Linking } from 'r
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '@/contexts/AuthContext';
 import { useDbQuery } from '@/hooks/useDbQuery';
 import type { StudioContent } from '@/hooks/useStudioContent';
+import { openWaitlist } from '@/lib/waitlist';
 import Cta from '@/components/common/Cta';
 
 const C = {
@@ -15,7 +15,6 @@ const C = {
 export default function StudioScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { isAuthenticated } = useAuth();
   const { data: recordings, loading } = useDbQuery<StudioContent>(
     'studio:recorded',
     `SELECT * FROM studio_content WHERE published = true AND content_type = 'recorded' ORDER BY sort_order ASC`,
@@ -44,14 +43,12 @@ export default function StudioScreen() {
           Live breathwork sessions and a full library of guided practices are on the way.
           We will let you know the moment it opens.
         </Text>
-        {!isAuthenticated && (
-          <Cta
-            title="Create an account"
-            variant="secondary"
-            onPress={() => router.push('/auth/sign-up')}
-            style={{ alignSelf: 'center', marginTop: 24 }}
-          />
-        )}
+        <Cta
+          title="Join the Waitlist"
+          variant="secondary"
+          onPress={openWaitlist}
+          style={{ alignSelf: 'center', marginTop: 24 }}
+        />
       </View>
 
       {/* What you get */}

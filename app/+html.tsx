@@ -15,14 +15,14 @@ export default function Root({ children }: PropsWithChildren) {
         <link rel="apple-touch-icon" href="/favicon.png" />
 
         {/* Primary */}
-        <title>Alua · Men's Breathwork & Surf Retreats</title>
-        <meta name="description" content="Breathwork and surf retreats for men. Slow down, get in the water, and meet yourself with an open heart. Sri Lanka · Indonesia · Costa Rica." />
+        <title>Alua · Retreats for Men</title>
+        <meta name="description" content="Breath. Surf. Community. A new wave of brotherhood. Breathwork and surf retreats for men, coming Fall 2026. Join the waitlist." />
 
         {/* Open Graph */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://alua.on.recursiv.io" />
-        <meta property="og:title" content="Alua · Men's Breathwork & Surf Retreats" />
-        <meta property="og:description" content="Breathwork and surf retreats for men. Slow down, get in the water, and meet yourself with an open heart. Sri Lanka · Indonesia · Costa Rica." />
+        <meta property="og:title" content="Alua · Retreats for Men" />
+        <meta property="og:description" content="Breath. Surf. Community. A new wave of brotherhood. Breathwork and surf retreats for men, coming Fall 2026. Join the waitlist." />
         <meta property="og:site_name" content="Alua" />
         {/* Swap this when branding delivers a real OG image */}
         {/* <meta property="og:image" content="https://alua.on.recursiv.io/og-image.png" /> */}
@@ -31,8 +31,8 @@ export default function Root({ children }: PropsWithChildren) {
 
         {/* Twitter / iMessage */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Alua · Men's Breathwork & Surf Retreats" />
-        <meta name="twitter:description" content="Breathwork and surf retreats for men. Slow down, get in the water, and meet yourself with an open heart." />
+        <meta name="twitter:title" content="Alua · Retreats for Men" />
+        <meta name="twitter:description" content="Breath. Surf. Community. A new wave of brotherhood. Retreats for men, coming Fall 2026. Join the waitlist." />
 
         {/* Theme */}
         <meta name="theme-color" content="#FAF7F4" />

@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '@/contexts/AuthContext';
+import { openWaitlist } from '@/lib/waitlist';
 import Cta from '@/components/common/Cta';
 
 const C = {
@@ -16,7 +16,6 @@ const C = {
 export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { isAuthenticated } = useAuth();
   const { width, height } = useWindowDimensions();
   const isWeb = Platform.OS === 'web';
   const isWide = width > 900;
@@ -37,8 +36,6 @@ export default function HomeScreen() {
   }, [breath]);
   const glowScale = breath.interpolate({ inputRange: [0, 1], outputRange: [0.85, 1.2] });
   const glowOpacity = breath.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0.7] });
-
-  const goSignUp = () => router.push('/auth/sign-up');
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: C.bg }} contentContainerStyle={{ paddingBottom: insets.bottom + 60 }} showsVerticalScrollIndicator={false}>
@@ -62,10 +59,11 @@ export default function HomeScreen() {
         <View style={[s.heroInner, { zIndex: 1 }]}>
           <Text style={[s.brandMark, isWide && s.brandMarkLarge]}>ALUA</Text>
           <View style={s.heroLine} />
-          <Text style={[s.heroTagline, isWide && s.heroTaglineLarge]}>Men's Breathwork & Surf Retreats</Text>
-          <Text style={s.heroSub}>Sri Lanka  ·  Indonesia  ·  Costa Rica</Text>
+          <Text style={[s.heroTagline, isWide && s.heroTaglineLarge]}>Breath. Surf. Community.</Text>
+          <Text style={[s.heroStatement, isWide && s.heroStatementLarge]}>A new wave of brotherhood.</Text>
+          <Text style={s.heroMeta}>Breathwork and surf retreats for men.{'\n'}Coming Fall 2026.</Text>
         </View>
-        <Cta title="Explore Retreats" onPress={() => router.push('/(tabs)/retreats')} style={{ marginTop: 48, alignSelf: 'center', zIndex: 1 }} />
+        <Cta title="Join the Waitlist" onPress={openWaitlist} style={{ marginTop: 40, alignSelf: 'center', zIndex: 1 }} />
         <Text style={[s.scrollHint, { zIndex: 1 }]}>↓</Text>
       </View>
 
@@ -167,14 +165,7 @@ export default function HomeScreen() {
           <Text style={s.ctaSub}>
             No surf experience needed. No fitness test.{'\n'}Just a willingness to slow down and show up with an open heart.
           </Text>
-          {isAuthenticated ? (
-            <Cta title="Browse Retreats" onPress={() => router.push('/(tabs)/retreats')} style={{ alignSelf: 'center' }} />
-          ) : (
-            <View style={{ alignItems: 'center' }}>
-              <Cta title="Create Your Account" onPress={goSignUp} style={{ alignSelf: 'center' }} />
-              <Cta title="View Retreats" variant="secondary" onPress={() => router.push('/(tabs)/retreats')} style={{ alignSelf: 'center' }} />
-            </View>
-          )}
+          <Cta title="Join the Waitlist" onPress={openWaitlist} style={{ alignSelf: 'center' }} />
         </View>
       </View>
 
@@ -207,6 +198,9 @@ const s = StyleSheet.create({
   heroLine: { width: 40, height: 1, backgroundColor: C.accent, marginBottom: 20 },
   heroTagline: { fontSize: 15, fontWeight: '400', letterSpacing: 4, color: C.textLight, textTransform: 'uppercase', textAlign: 'center', paddingLeft: 4 },
   heroTaglineLarge: { fontSize: 17, letterSpacing: 6, paddingLeft: 6 },
+  heroStatement: { fontSize: 22, fontWeight: '300', color: C.text, letterSpacing: -0.3, marginTop: 20, textAlign: 'center' },
+  heroStatementLarge: { fontSize: 30, marginTop: 24 },
+  heroMeta: { fontSize: 13, fontWeight: '400', letterSpacing: 0.5, color: C.textMuted, textAlign: 'center', lineHeight: 21, marginTop: 18 },
   heroSub: { fontSize: 13, letterSpacing: 3, color: C.textMuted, textTransform: 'uppercase', marginTop: 12, textAlign: 'center', paddingLeft: 3 },
   scrollHint: { position: 'absolute', bottom: 32, fontSize: 18, color: C.textMuted },
 

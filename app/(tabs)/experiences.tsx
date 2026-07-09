@@ -1,15 +1,13 @@
 import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '@/contexts/AuthContext';
 import { formatPrice } from '@/constants/pricing';
 import { EXPERIENCE_INCLUDED } from '@/constants/content';
 import { useDbQuery } from '@/hooks/useDbQuery';
 import type { Experience } from '@/hooks/useExperiences';
+import { openWaitlist } from '@/lib/waitlist';
 import Cta from '@/components/common/Cta';
 import { ListSkeleton } from '@/components/common/Skeleton';
-import { showUnderConstruction } from '@/lib/toast';
 
 const C = {
   bg: '#FAF7F4', text: '#1A1A1A', textLight: '#6B6560', textMuted: '#A09890',
@@ -23,9 +21,7 @@ const STATIC = [
 ];
 
 export default function ExperiencesScreen() {
-  const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { isAuthenticated } = useAuth();
   const { data: experiences, loading } = useDbQuery<Experience>(
     'experiences:list',
     `SELECT e.*, l.name as location_name FROM experiences e LEFT JOIN locations l ON e.location_id = l.id WHERE e.status = 'published' ORDER BY e.created_at DESC`,
@@ -56,8 +52,7 @@ export default function ExperiencesScreen() {
                 <Text style={s.expPrice}>{formatPrice(e.price_cents)}</Text>
               </View>
               <View style={s.expActions}>
-                <Cta title="View Details" variant="secondary" onPress={() => showUnderConstruction()} style={{ marginTop: 0 }} />
-                <Cta title="Book Now" onPress={() => showUnderConstruction()} style={{ marginTop: 0 }} />
+                <Cta title="Join the Waitlist" onPress={openWaitlist} style={{ marginTop: 0 }} />
               </View>
             </View>
           ))}
@@ -68,11 +63,7 @@ export default function ExperiencesScreen() {
                 <Text style={s.expLocation}>{e.location}</Text>
                 <Text style={s.expPrice}>{e.price}</Text>
               </View>
-              <Cta
-                title={isAuthenticated ? "Book This Experience" : "Sign Up to Book"}
-                onPress={() => isAuthenticated ? showUnderConstruction() : router.push('/auth/sign-up')}
-                style={{ marginTop: 20 }}
-              />
+              <Cta title="Join the Waitlist" onPress={openWaitlist} style={{ marginTop: 20 }} />
             </View>
           ))}
         </View>
@@ -91,10 +82,8 @@ export default function ExperiencesScreen() {
       </View>
 
       <View style={s.bottomCta}>
-        <Text style={s.bottomCtaText}>Available at each location during season.</Text>
-        {!isAuthenticated && (
-          <Cta title="Create Account to Book" onPress={() => router.push('/auth/sign-up')} />
-        )}
+        <Text style={s.bottomCtaText}>Available at each location during season. Coming Fall 2026.</Text>
+        <Cta title="Join the Waitlist" onPress={openWaitlist} />
       </View>
     </ScrollView>
   );

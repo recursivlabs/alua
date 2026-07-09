@@ -2,14 +2,13 @@ import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from 'react-nati
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '@/contexts/AuthContext';
 import { formatPrice } from '@/constants/pricing';
 import { RETREAT_INCLUDED } from '@/constants/content';
 import { useDbQuery } from '@/hooks/useDbQuery';
 import type { Retreat } from '@/hooks/useRetreats';
+import { openWaitlist } from '@/lib/waitlist';
 import Cta from '@/components/common/Cta';
 import { ListSkeleton } from '@/components/common/Skeleton';
-import { showUnderConstruction } from '@/lib/toast';
 
 const C = {
   bg: '#FAF7F4', text: '#1A1A1A', textLight: '#6B6560', textMuted: '#A09890',
@@ -25,7 +24,6 @@ const STATIC_RETREATS = [
 export default function RetreatsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { isAuthenticated } = useAuth();
   const { data: retreats, loading } = useDbQuery<Retreat>(
     'retreats:list',
     `SELECT r.*, l.name as location_name, l.country as location_country FROM retreats r LEFT JOIN locations l ON r.location_id = l.id WHERE r.status = 'published' ORDER BY r.start_date ASC`,
@@ -66,10 +64,7 @@ export default function RetreatsScreen() {
                     <Text style={s.spotsWarning}>{spotsLeft} spots remaining</Text>
                   )}
                 </TouchableOpacity>
-                <View style={s.retreatActions}>
-                  <Cta title="View Details" variant="secondary" onPress={() => showUnderConstruction()} style={{ marginTop: 0 }} />
-                  <Cta title="Book Now" onPress={() => showUnderConstruction()} style={{ marginTop: 0 }} />
-                </View>
+                <Cta title="Join the Waitlist" onPress={openWaitlist} style={{ marginTop: 20 }} />
               </View>
             );
           })}
@@ -82,11 +77,7 @@ export default function RetreatsScreen() {
               </View>
               <Text style={s.retreatLocation}>{r.location}</Text>
               <Text style={s.retreatDates}>{r.dates}</Text>
-              <Cta
-                title={isAuthenticated ? "Book This Retreat" : "Sign Up to Book"}
-                onPress={() => isAuthenticated ? showUnderConstruction() : router.push('/auth/sign-up')}
-                style={{ marginTop: 20 }}
-              />
+              <Cta title="Join the Waitlist" onPress={openWaitlist} style={{ marginTop: 20 }} />
             </View>
           ))}
         </View>
