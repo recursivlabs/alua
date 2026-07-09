@@ -15,11 +15,20 @@ import { getCached, setCache } from '@/lib/cache';
 export function useDbQuery<T = unknown>(cacheKey: string, sql: string, params: unknown[] = []) {
   const ctx = useRecursivSafe();
   const [data, setData] = useState<T[]>(() => (getCached(cacheKey) as T[] | null) ?? []);
-  const [loading, setLoading] = useState<boolean>(() => getCached(cacheKey) == null);
+  // Only show a skeleton when we can actually fetch (signed-in) and have no
+  // cache yet. Logged-out visitors go straight to the bundled fallback.
+  const [loading, setLoading] = useState<boolean>(() => !!ctx?.sdk && getCached(cacheKey) == null);
   const paramsKey = JSON.stringify(params);
 
   useEffect(() => {
-    if (!ctx?.sdk) return;
+    // Logged-out / public visitor: there's no authenticated SDK (the app only
+    // mounts RecursivProvider when signed in). We can't read the DB, so resolve
+    // loading and let the page fall through to its bundled fallback content
+    // instead of hanging on a skeleton forever.
+    if (!ctx?.sdk) {
+      setLoading(false);
+      return;
+    }
     let cancelled = false;
     dbQuery<T>(ctx.sdk, sql, params)
       .then((rows) => {
