@@ -83,7 +83,7 @@ export default function ExperiencesScreen() {
 
       <View style={s.bottomCta}>
         <Text style={s.bottomCtaText}>Available at each location during season. Coming Fall 2026.</Text>
-        <Cta title="Join the Waitlist" onPress={openWaitlist} />
+        <Cta title="Join the Waitlist" onPress={openWaitlist} style={{ alignSelf: 'center' }} />
       </View>
     </ScrollView>
   );

@@ -24,15 +24,18 @@ export default function Root({ children }: PropsWithChildren) {
         <meta property="og:title" content="Alua · Retreats for Men" />
         <meta property="og:description" content="Breath. Surf. Community. A new wave of brotherhood. Breathwork and surf retreats for men, coming Fall 2026. Join the waitlist." />
         <meta property="og:site_name" content="Alua" />
-        {/* Swap this when branding delivers a real OG image */}
-        {/* <meta property="og:image" content="https://alua.on.recursiv.io/og-image.png" /> */}
-        {/* <meta property="og:image:width" content="1200" /> */}
-        {/* <meta property="og:image:height" content="630" /> */}
+        <meta property="og:image" content="https://alua.on.recursiv.io/og-image.png?v=3" />
+        <meta property="og:image:secure_url" content="https://alua.on.recursiv.io/og-image.png?v=3" />
+        <meta property="og:image:type" content="image/png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Alua — A new wave of brotherhood. Retreats for men, Fall 2026." />
 
         {/* Twitter / iMessage */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Alua · Retreats for Men" />
         <meta name="twitter:description" content="Breath. Surf. Community. A new wave of brotherhood. Retreats for men, coming Fall 2026. Join the waitlist." />
+        <meta name="twitter:image" content="https://alua.on.recursiv.io/og-image.png?v=3" />
 
         {/* Theme */}
         <meta name="theme-color" content="#FAF7F4" />
