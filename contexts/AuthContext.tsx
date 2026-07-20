@@ -24,6 +24,7 @@ const API_KEY_SCOPES = [
   'storage:read', 'storage:write',
   'organizations:read', 'organizations:write',
   'databases:read', 'databases:write',
+  'billing:read', 'billing:write',
 ] as const;
 
 export interface AuthUser {

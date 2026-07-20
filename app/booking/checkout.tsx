@@ -1,13 +1,13 @@
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRecursiv } from '@/contexts/RecursivContext';
 import { dbQuery } from '@/lib/database';
 import { formatPrice } from '@/constants/pricing';
-import { sendBookingConfirmation, addToMailingList } from '@/lib/email';
+import { startBooking, BOOKING_ENABLED } from '@/lib/booking';
 import type { Retreat } from '@/hooks/useRetreats';
 import type { Experience } from '@/hooks/useExperiences';
 
@@ -26,7 +26,7 @@ export default function CheckoutScreen() {
   const [item, setItem] = useState<(Retreat | Experience) | null>(null);
   const [fetching, setFetching] = useState(true);
 
-  useState(() => {
+  useEffect(() => {
     const sql = type === 'retreat'
       ? `SELECT r.*, l.name as location_name FROM retreats r LEFT JOIN locations l ON r.location_id = l.id WHERE r.id = $1`
       : `SELECT e.*, l.name as location_name FROM experiences e LEFT JOIN locations l ON e.location_id = l.id WHERE e.id = $1`;
@@ -34,7 +34,7 @@ export default function CheckoutScreen() {
       .then((rows) => setItem(rows[0] || null))
       .catch(console.error)
       .finally(() => setFetching(false));
-  });
+  }, [sdk, type, id]);
 
   if (fetching || !item) {
     return (
@@ -53,39 +53,28 @@ export default function CheckoutScreen() {
     ? `${new Date(startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${new Date(endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
     : '';
 
-  const handleBook = async () => {
-    if (!user) return;
+  const handlePay = async () => {
+    if (!user) { router.replace('/auth/sign-in'); return; }
+    if (!BOOKING_ENABLED) {
+      Alert.alert('Booking not open yet', "Online booking is opening soon. Join the waitlist and we'll be in touch.");
+      return;
+    }
     setLoading(true);
     try {
-      await dbQuery(sdk, `
-        INSERT INTO bookings (user_id, booking_type, item_id, amount_cents, status, payment_status)
-        VALUES ($1, $2, $3, $4, 'confirmed', 'pending')
-      `, [user.id, type, id, priceCents]);
-
-      // Send confirmation email
-      await sendBookingConfirmation(
-        sdk,
-        user.email,
-        user.name || 'Guest',
-        type,
-        title,
-        locationName,
-        formatPrice(priceCents),
-        dateStr
-      );
-
-      // Add to mailing list
-      await addToMailingList(sdk, user.email, user.name, 'booking');
-
-      // Update capacity for retreats
-      if (type === 'retreat') {
-        await dbQuery(sdk, `UPDATE retreats SET current_bookings = current_bookings + 1 WHERE id = $1`, [id]);
+      const res = await startBooking({
+        name: locationName ? `${title} — ${locationName}` : title,
+        amountCents: priceCents,
+        itemType: type === 'retreat' ? 'retreat' : 'experience',
+        itemId: String(id),
+        returnPath: '/booking/confirmation',
+      });
+      if (!res.ok) {
+        Alert.alert('Checkout Error', friendlyError(res.error));
+        setLoading(false);
       }
-
-      router.replace('/booking/confirmation');
+      // On success the browser is redirecting to Stripe; keep the spinner up.
     } catch (err: any) {
-      Alert.alert('Booking Error', err.message || 'Something went wrong');
-    } finally {
+      Alert.alert('Checkout Error', err?.message || 'Something went wrong');
       setLoading(false);
     }
   };
@@ -95,26 +84,26 @@ export default function CheckoutScreen() {
       <View style={s.content}>
         <Text style={s.eyebrow}>{type === 'retreat' ? 'RETREAT BOOKING' : 'EXPERIENCE BOOKING'}</Text>
         <Text style={s.title}>{title}</Text>
-        {locationName && <Text style={s.location}>{locationName}</Text>}
-        {dateStr && <Text style={s.dates}>{dateStr}</Text>}
+        {locationName ? <Text style={s.location}>{locationName}</Text> : null}
+        {dateStr ? <Text style={s.dates}>{dateStr}</Text> : null}
 
         <View style={s.summaryCard}>
           <View style={s.summaryRow}>
             <Text style={s.summaryLabel}>Booking</Text>
             <Text style={s.summaryValue}>{title}</Text>
           </View>
-          {locationName && (
+          {locationName ? (
             <View style={s.summaryRow}>
               <Text style={s.summaryLabel}>Location</Text>
               <Text style={s.summaryValue}>{locationName}</Text>
             </View>
-          )}
-          {dateStr && (
+          ) : null}
+          {dateStr ? (
             <View style={s.summaryRow}>
               <Text style={s.summaryLabel}>Dates</Text>
               <Text style={s.summaryValue}>{dateStr}</Text>
             </View>
-          )}
+          ) : null}
           <View style={s.divider} />
           <View style={s.summaryRow}>
             <Text style={s.summaryLabel}>Total</Text>
@@ -123,21 +112,30 @@ export default function CheckoutScreen() {
         </View>
 
         <View style={s.infoRow}>
-          <Ionicons name="mail-outline" size={16} color={C.accent} />
-          <Text style={s.infoText}>Confirmation email will be sent to {user?.email}</Text>
+          <Ionicons name="lock-closed-outline" size={16} color={C.accent} />
+          <Text style={s.infoText}>Secure payment via Stripe. Your seat is confirmed the moment payment clears.</Text>
         </View>
 
         <View style={s.infoRow}>
-          <Ionicons name="card-outline" size={16} color={C.textMuted} />
-          <Text style={s.infoText}>Payment processing is being set up. Your booking will be confirmed and the team will follow up on payment.</Text>
+          <Ionicons name="mail-outline" size={16} color={C.textMuted} />
+          <Text style={s.infoText}>A confirmation email goes to {user?.email}</Text>
         </View>
       </View>
 
-      <TouchableOpacity style={[s.bookBtn, loading && { opacity: 0.6 }]} onPress={handleBook} disabled={loading}>
-        {loading ? <ActivityIndicator color={C.white} /> : <Text style={s.bookBtnText}>Confirm Booking</Text>}
+      <TouchableOpacity style={[s.bookBtn, loading && { opacity: 0.6 }]} onPress={handlePay} disabled={loading}>
+        {loading ? <ActivityIndicator color={C.white} /> : <Text style={s.bookBtnText}>Pay {formatPrice(priceCents)}</Text>}
       </TouchableOpacity>
     </View>
   );
+}
+
+function friendlyError(code: string): string {
+  switch (code) {
+    case 'not_authenticated': return 'Please sign in and try again.';
+    case 'booking_disabled': return 'Online booking is opening soon.';
+    case 'no_checkout_url': return 'Could not start checkout. Please try again.';
+    default: return code || 'Something went wrong. Please try again.';
+  }
 }
 
 const s = StyleSheet.create({

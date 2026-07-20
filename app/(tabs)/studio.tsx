@@ -1,10 +1,20 @@
-import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Linking } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Linking, ActivityIndicator, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useDbQuery } from '@/hooks/useDbQuery';
 import type { StudioContent } from '@/hooks/useStudioContent';
 import { openWaitlist } from '@/lib/waitlist';
+import { formatPrice, STUDIO_PRICING } from '@/constants/pricing';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  BOOKING_ENABLED,
+  getSubscriptionStatus,
+  startSubscription,
+  openBillingPortal,
+  type SubscriptionStatus,
+} from '@/lib/booking';
 import Cta from '@/components/common/Cta';
 
 const C = {
@@ -35,21 +45,7 @@ export default function StudioScreen() {
         </Text>
       </View>
 
-      {/* Coming soon */}
-      <View style={[s.section, { backgroundColor: C.dark, alignItems: 'center' }]}>
-        <Text style={s.comingTag}>OPENING SOON</Text>
-        <Text style={s.comingTitle}>Coming soon</Text>
-        <Text style={s.comingSub}>
-          Live breathwork sessions and a full library of guided practices are on the way.
-          We will let you know the moment it opens.
-        </Text>
-        <Cta
-          title="Join the Waitlist"
-          variant="secondary"
-          onPress={openWaitlist}
-          style={{ alignSelf: 'center', marginTop: 24 }}
-        />
-      </View>
+      <MembershipBlock />
 
       {/* What you get */}
       <View style={s.section}>
@@ -134,6 +130,95 @@ export default function StudioScreen() {
         </Text>
       </View>
     </ScrollView>
+  );
+}
+
+/** Membership card: waitlist until BOOKING_ENABLED, then subscribe / manage. */
+function MembershipBlock() {
+  const router = useRouter();
+  const { isAuthenticated } = useAuth();
+  const [sub, setSub] = useState<SubscriptionStatus | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (!BOOKING_ENABLED || !isAuthenticated) return;
+    getSubscriptionStatus().then(setSub).catch(() => {});
+  }, [isAuthenticated]);
+
+  // Pre-launch: keep the waitlist card.
+  if (!BOOKING_ENABLED) {
+    return (
+      <View style={[s.section, { backgroundColor: C.dark, alignItems: 'center' }]}>
+        <Text style={s.comingTag}>OPENING SOON</Text>
+        <Text style={s.comingTitle}>Coming soon</Text>
+        <Text style={s.comingSub}>
+          Live breathwork sessions and a full library of guided practices are on the way.
+          We will let you know the moment it opens.
+        </Text>
+        <Cta title="Join the Waitlist" variant="secondary" onPress={openWaitlist} style={{ alignSelf: 'center', marginTop: 24 }} />
+      </View>
+    );
+  }
+
+  const subscribe = async (tier: 'monthly' | 'annual') => {
+    if (!isAuthenticated) {
+      router.push(`/auth/sign-up?returnTo=${encodeURIComponent('/studio')}`);
+      return;
+    }
+    setBusy(true);
+    const res = await startSubscription({ tier, returnPath: '/studio' });
+    if (!res.ok) {
+      Alert.alert('Could not start membership', res.error === 'no_checkout_url'
+        ? 'Membership pricing is being finalized. Please try again shortly.'
+        : 'Something went wrong. Please try again.');
+      setBusy(false);
+    }
+  };
+
+  const manage = async () => {
+    setBusy(true);
+    const res = await openBillingPortal('/studio');
+    if (!res.ok) { Alert.alert('Could not open billing', 'Please try again.'); setBusy(false); }
+  };
+
+  // Active member.
+  if (sub?.active) {
+    const renews = sub.currentPeriodEnd
+      ? new Date(sub.currentPeriodEnd).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      : '';
+    return (
+      <View style={[s.section, { backgroundColor: C.dark, alignItems: 'center' }]}>
+        <Text style={s.comingTag}>MEMBERSHIP</Text>
+        <Text style={s.comingTitle}>You're in</Text>
+        <Text style={s.comingSub}>Your Studio membership is active{renews ? `. Renews ${renews}.` : '.'}</Text>
+        <TouchableOpacity style={s.subscribeBtnDark} onPress={manage} disabled={busy}>
+          {busy ? <ActivityIndicator color={C.white} /> : <Text style={s.subscribeBtnText}>Manage Membership</Text>}
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  // Not a member yet.
+  return (
+    <View style={[s.section, { backgroundColor: C.dark, alignItems: 'center' }]}>
+      <Text style={s.comingTag}>MEMBERSHIP</Text>
+      <Text style={s.comingTitle}>Join the Studio</Text>
+      <Text style={s.comingSub}>Live sessions and the full practice library. Cancel anytime.</Text>
+      <View style={s.pricingRow}>
+        <TouchableOpacity style={s.priceOption} onPress={() => subscribe('monthly')} disabled={busy}>
+          <Text style={s.priceLabel}>Monthly</Text>
+          <Text style={s.priceAmount}>{formatPrice(STUDIO_PRICING.monthly)}</Text>
+          <Text style={s.pricePer}>per month</Text>
+        </TouchableOpacity>
+        <View style={s.priceDivider} />
+        <TouchableOpacity style={s.priceOption} onPress={() => subscribe('annual')} disabled={busy}>
+          <Text style={s.priceLabel}>Annual</Text>
+          <Text style={s.priceAmount}>{formatPrice(STUDIO_PRICING.annual)}</Text>
+          <Text style={s.pricePer}>per year</Text>
+        </TouchableOpacity>
+      </View>
+      {busy && <ActivityIndicator color={C.white} style={{ marginTop: 16 }} />}
+    </View>
   );
 }
 

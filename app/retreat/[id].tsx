@@ -7,6 +7,8 @@ import { useRetreat } from '@/hooks/useRetreats';
 import { formatPrice, CANCELLATION_POLICY } from '@/constants/pricing';
 import { DEFAULT_PACKING_LIST } from '@/constants/content';
 import { useAuth } from '@/contexts/AuthContext';
+import { BOOKING_ENABLED } from '@/lib/booking';
+import { openWaitlist } from '@/lib/waitlist';
 
 export default function RetreatDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -26,6 +28,7 @@ export default function RetreatDetailScreen() {
   }
 
   const spotsLeft = retreat.max_capacity - retreat.current_bookings;
+  const soldOut = BOOKING_ENABLED && spotsLeft <= 0;
   const startDate = new Date(retreat.start_date);
   const endDate = new Date(retreat.end_date);
   const dateStr = `${startDate.toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric' })} – ${endDate.toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' })}`;
@@ -108,16 +111,18 @@ export default function RetreatDetailScreen() {
           <Text style={[styles.bookPer, { color: colors.textMuted }]}>per person</Text>
         </View>
         <TouchableOpacity
-          style={[styles.bookBtn, spotsLeft <= 0 && styles.bookBtnDisabled]}
-          disabled={spotsLeft <= 0}
+          style={[styles.bookBtn, soldOut && styles.bookBtnDisabled]}
+          disabled={soldOut}
           onPress={() => {
+            if (!BOOKING_ENABLED) { openWaitlist(); return; }
+            const checkoutPath = `/booking/checkout?type=retreat&id=${retreat.id}`;
             if (!isAuthenticated) {
-              router.push('/auth/sign-up');
+              router.push(`/auth/sign-up?returnTo=${encodeURIComponent(checkoutPath)}`);
             } else {
               router.push({ pathname: '/booking/checkout', params: { type: 'retreat', id: retreat.id } });
             }
           }}>
-          <Text style={styles.bookBtnText}>{spotsLeft <= 0 ? 'Sold Out' : 'Book Now'}</Text>
+          <Text style={styles.bookBtnText}>{soldOut ? 'Sold Out' : BOOKING_ENABLED ? 'Book Now' : 'Join the Waitlist'}</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

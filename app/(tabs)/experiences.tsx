@@ -1,4 +1,5 @@
 import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { formatPrice } from '@/constants/pricing';
@@ -6,6 +7,8 @@ import { EXPERIENCE_INCLUDED } from '@/constants/content';
 import { useDbQuery } from '@/hooks/useDbQuery';
 import type { Experience } from '@/hooks/useExperiences';
 import { openWaitlist } from '@/lib/waitlist';
+import { BOOKING_ENABLED } from '@/lib/booking';
+import { useAuth } from '@/contexts/AuthContext';
 import Cta from '@/components/common/Cta';
 import { ListSkeleton } from '@/components/common/Skeleton';
 
@@ -22,6 +25,16 @@ const STATIC = [
 
 export default function ExperiencesScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const { isAuthenticated } = useAuth();
+  const bookExperience = (id: string) => {
+    const checkoutPath = `/booking/checkout?type=experience&id=${id}`;
+    if (!isAuthenticated) {
+      router.push(`/auth/sign-up?returnTo=${encodeURIComponent(checkoutPath)}`);
+    } else {
+      router.push({ pathname: '/booking/checkout', params: { type: 'experience', id } });
+    }
+  };
   const { data: experiences, loading } = useDbQuery<Experience>(
     'experiences:list',
     `SELECT e.*, l.name as location_name FROM experiences e LEFT JOIN locations l ON e.location_id = l.id WHERE e.status = 'published' ORDER BY e.created_at DESC`,
@@ -52,7 +65,11 @@ export default function ExperiencesScreen() {
                 <Text style={s.expPrice}>{formatPrice(e.price_cents)}</Text>
               </View>
               <View style={s.expActions}>
-                <Cta title="Join the Waitlist" onPress={openWaitlist} style={{ marginTop: 0 }} />
+                {BOOKING_ENABLED ? (
+                  <Cta title="Book Now" onPress={() => bookExperience(e.id)} style={{ marginTop: 0 }} />
+                ) : (
+                  <Cta title="Join the Waitlist" onPress={openWaitlist} style={{ marginTop: 0 }} />
+                )}
               </View>
             </View>
           ))}
