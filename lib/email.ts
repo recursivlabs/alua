@@ -33,7 +33,7 @@ async function sendEmail(sdk: Recursiv, to: string, subject: string, body: strin
     await sdk.email.send({
       to,
       subject,
-      body,
+      text: body,
     });
     console.log(`[email] Sent "${subject}" to ${to}`);
   } catch (err: any) {

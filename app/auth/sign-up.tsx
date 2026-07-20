@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Brand, Colors, Spacing, Radius, Typography } from '@/constants/theme';
@@ -12,6 +12,7 @@ export default function SignUpScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const { signUp } = useAuth();
+  const { returnTo } = useLocalSearchParams<{ returnTo?: string }>();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -25,7 +26,7 @@ export default function SignUpScreen() {
     setError('');
     try {
       await signUp(name, email, password);
-      router.replace('/(tabs)');
+      router.replace((returnTo as any) || '/(tabs)');
     } catch (err: any) {
       setError(err.message || 'Sign up failed');
     } finally {
@@ -50,7 +51,7 @@ export default function SignUpScreen() {
           {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.btnText}>Create Account</Text>}
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.linkRow} onPress={() => router.push('/auth/sign-in')}>
+        <TouchableOpacity style={styles.linkRow} onPress={() => router.push(returnTo ? `/auth/sign-in?returnTo=${encodeURIComponent(returnTo as string)}` : '/auth/sign-in')}>
           <Text style={[styles.linkText, { color: colors.textSecondary }]}>Already have an account? </Text>
           <Text style={[styles.linkTextBold, { color: Brand.primary }]}>Sign in</Text>
         </TouchableOpacity>

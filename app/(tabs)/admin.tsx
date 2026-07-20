@@ -42,6 +42,7 @@ export default function AdminScreen() {
   const [formPrice, setFormPrice] = useState('');
   const [formStartDate, setFormStartDate] = useState('');
   const [formEndDate, setFormEndDate] = useState('');
+  const [formCapacity, setFormCapacity] = useState('12');
   const [formCategory, setFormCategory] = useState('breathwork');
   const [formDuration, setFormDuration] = useState('');
   const [formExternalLink, setFormExternalLink] = useState('');
@@ -60,13 +61,14 @@ export default function AdminScreen() {
     if (!ctx?.sdk) return;
     setLoading(true);
     try {
-      const [s1, s2, s3, s4, s5, s6, locs, rets, exps, studio, faqData, bookingData] = await Promise.all([
+      const [s1, s2, s3, s4, s5, s6, s7, locs, rets, exps, studio, faqData, bookingData] = await Promise.all([
         dbQuery<{ count: number }>(ctx.sdk, `SELECT COUNT(*)::int as count FROM retreats`),
         dbQuery<{ count: number }>(ctx.sdk, `SELECT COUNT(*)::int as count FROM experiences`),
         dbQuery<{ count: number }>(ctx.sdk, `SELECT COUNT(*)::int as count FROM bookings`),
         dbQuery<{ count: number }>(ctx.sdk, `SELECT COUNT(*)::int as count FROM guest_profiles`),
         dbQuery<{ count: number }>(ctx.sdk, `SELECT COUNT(*)::int as count FROM studio_subscriptions WHERE status = 'active'`),
         dbQuery<{ count: number }>(ctx.sdk, `SELECT COUNT(*)::int as count FROM mailing_list`),
+        dbQuery<{ count: number }>(ctx.sdk, `SELECT COALESCE(SUM(amount_cents),0)::int as count FROM bookings WHERE payment_status = 'paid'`),
         dbQuery(ctx.sdk, `SELECT * FROM locations ORDER BY season_start`),
         dbQuery(ctx.sdk, `SELECT r.*, l.name as location_name FROM retreats r LEFT JOIN locations l ON r.location_id = l.id ORDER BY r.start_date DESC`),
         dbQuery(ctx.sdk, `SELECT e.*, l.name as location_name FROM experiences e LEFT JOIN locations l ON e.location_id = l.id ORDER BY e.created_at DESC`),
@@ -74,7 +76,7 @@ export default function AdminScreen() {
         dbQuery(ctx.sdk, `SELECT * FROM faqs ORDER BY sort_order ASC`),
         dbQuery(ctx.sdk, `SELECT b.*, COALESCE(r.title, e.title) as item_title FROM bookings b LEFT JOIN retreats r ON b.booking_type='retreat' AND b.item_id=r.id LEFT JOIN experiences e ON b.booking_type='experience' AND b.item_id=e.id ORDER BY b.booked_at DESC LIMIT 50`),
       ]);
-      setStats({ retreats: s1[0]?.count||0, experiences: s2[0]?.count||0, bookings: s3[0]?.count||0, guests: s4[0]?.count||0, subscribers: s5[0]?.count||0, mailing: s6[0]?.count||0 });
+      setStats({ retreats: s1[0]?.count||0, experiences: s2[0]?.count||0, bookings: s3[0]?.count||0, guests: s4[0]?.count||0, subscribers: s5[0]?.count||0, mailing: s6[0]?.count||0, revenueCents: s7[0]?.count||0 });
       setLocations(locs);
       setRetreats(rets);
       setExperiences(exps);
@@ -91,7 +93,7 @@ export default function AdminScreen() {
   const resetForm = () => {
     setShowForm(false);
     setFormTitle(''); setFormDesc(''); setFormLocation(''); setFormPrice('');
-    setFormStartDate(''); setFormEndDate(''); setFormCategory('breathwork');
+    setFormStartDate(''); setFormEndDate(''); setFormCapacity('12'); setFormCategory('breathwork');
     setFormDuration(''); setFormExternalLink(''); setFormContentType('recorded');
     setFormQuestion(''); setFormAnswer(''); setFormFaqCategory('general');
   };
@@ -104,9 +106,10 @@ export default function AdminScreen() {
     setSaving(true);
     try {
       await dbQuery(ctx.sdk, `
-        INSERT INTO retreats (location_id, title, description, start_date, end_date, price_cents, status, included, daily_schedule, packing_list, cancellation_policy)
-        VALUES ($1, $2, $3, $4, $5, $6, 'published', $7, $8, $9, $10)
+        INSERT INTO retreats (location_id, title, description, start_date, end_date, price_cents, max_capacity, status, included, daily_schedule, packing_list, cancellation_policy)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, 'published', $8, $9, $10, $11)
       `, [formLocation, formTitle, formDesc, formStartDate, formEndDate, Math.round(parseFloat(formPrice) * 100),
+          Math.max(1, parseInt(formCapacity) || 12),
           JSON.stringify(RETREAT_INCLUDED), JSON.stringify(DEFAULT_DAILY_SCHEDULE), JSON.stringify(DEFAULT_PACKING_LIST), JSON.stringify(CANCELLATION_POLICY)]);
       resetForm();
       await loadAll();
@@ -224,6 +227,13 @@ export default function AdminScreen() {
       {/* Overview */}
       {tab === 'overview' && (
         <View style={s.section}>
+          <View style={[s.statCard, { marginBottom: 8 }]}>
+            <View style={s.statHeader}>
+              <Ionicons name="cash-outline" size={16} color={C.success} />
+              <Text style={[s.statValue, { color: C.success }]}>{formatPrice(stats.revenueCents || 0)}</Text>
+            </View>
+            <Text style={s.statLabel}>Revenue (paid bookings)</Text>
+          </View>
           <View style={s.statsGrid}>
             {[
               { label: 'Retreats', value: stats.retreats, icon: 'compass-outline' },
@@ -276,6 +286,8 @@ export default function AdminScreen() {
               <TextInput style={s.input} value={formStartDate} onChangeText={setFormStartDate} placeholder="2027-01-15" placeholderTextColor={C.textMuted} />
               <Text style={s.inputLabel}>End Date (YYYY-MM-DD)</Text>
               <TextInput style={s.input} value={formEndDate} onChangeText={setFormEndDate} placeholder="2027-01-20" placeholderTextColor={C.textMuted} />
+              <Text style={s.inputLabel}>Seats (total capacity)</Text>
+              <TextInput style={s.input} value={formCapacity} onChangeText={setFormCapacity} placeholder="12" placeholderTextColor={C.textMuted} keyboardType="numeric" />
               <TouchableOpacity style={[s.submitBtn, saving && { opacity: 0.6 }]} onPress={createRetreat} disabled={saving}>
                 <Text style={s.submitBtnText}>{saving ? 'Creating...' : 'Create Retreat'}</Text>
               </TouchableOpacity>
@@ -287,7 +299,7 @@ export default function AdminScreen() {
               <View style={s.listItemHeader}>
                 <View style={{ flex: 1 }}>
                   <Text style={s.listItemTitle}>{r.title}</Text>
-                  <Text style={s.listItemMeta}>{r.location_name} · {formatPrice(r.price_cents)} · {r.status}</Text>
+                  <Text style={s.listItemMeta}>{r.location_name} · {formatPrice(r.price_cents)} · {r.current_bookings ?? 0}/{r.max_capacity ?? 0} seats · {r.status}</Text>
                 </View>
                 <View style={s.listItemActions}>
                   <TouchableOpacity onPress={() => toggleStatus('retreats', r.id, r.status)} style={s.actionBtn}>

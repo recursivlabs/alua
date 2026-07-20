@@ -7,6 +7,7 @@ import { RETREAT_INCLUDED } from '@/constants/content';
 import { useDbQuery } from '@/hooks/useDbQuery';
 import type { Retreat } from '@/hooks/useRetreats';
 import { openWaitlist } from '@/lib/waitlist';
+import { BOOKING_ENABLED } from '@/lib/booking';
 import Cta from '@/components/common/Cta';
 import { ListSkeleton } from '@/components/common/Skeleton';
 
@@ -51,6 +52,7 @@ export default function RetreatsScreen() {
             const end = new Date(r.end_date);
             const dateStr = `${start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
             const spotsLeft = r.max_capacity - r.current_bookings;
+            const soldOut = BOOKING_ENABLED && spotsLeft <= 0;
             return (
               <View key={r.id} style={[s.retreatItem, i > 0 && { borderTopWidth: 1, borderTopColor: C.border }]}>
                 <TouchableOpacity onPress={() => router.push(`/retreat/${r.id}`)}>
@@ -60,11 +62,17 @@ export default function RetreatsScreen() {
                   </View>
                   <Text style={s.retreatLocation}>{r.location_name}</Text>
                   <Text style={s.retreatDates}>{dateStr}</Text>
-                  {spotsLeft <= 3 && spotsLeft > 0 && (
+                  {BOOKING_ENABLED && spotsLeft <= 3 && spotsLeft > 0 && (
                     <Text style={s.spotsWarning}>{spotsLeft} spots remaining</Text>
                   )}
                 </TouchableOpacity>
-                <Cta title="Join the Waitlist" onPress={openWaitlist} style={{ marginTop: 20 }} />
+                {!BOOKING_ENABLED ? (
+                  <Cta title="Join the Waitlist" onPress={openWaitlist} style={{ marginTop: 20 }} />
+                ) : soldOut ? (
+                  <Cta title="Sold Out" variant="secondary" onPress={() => {}} style={{ marginTop: 20 }} />
+                ) : (
+                  <Cta title="Book Now" onPress={() => router.push(`/retreat/${r.id}`)} style={{ marginTop: 20 }} />
+                )}
               </View>
             );
           })}
